@@ -62,7 +62,7 @@ def load_parameters(network, filename):
 
 @moxing_wrapper(pre_process=modelarts_pre_process, pre_args=[config])
 def run_eval(data_root = '/tmp/workspace/COCO2017/train/val2017',
-            ann_file = '/tmp/workspace/COCO2017/train/annotations/instances_val2017.json',
+            ann_file ="/tmp/workspace/COCO2017/train/annotations/instances_val2017.json",
             yolov5_version = "yolov5s",
             device = 'CPU',
             ckpt_folder = '/tmp/mindspore/model',
@@ -90,7 +90,7 @@ def run_eval(data_root = '/tmp/workspace/COCO2017/train/val2017',
         LOG(f'Checkpoints Folder Obtained from {ckpt_folder}')
         
         # Your device from config file
-        device = config.device_target
+        # device = config.device_target
         
         # version of yolov5 like yolov5s
         yolov5_version = config.yolov5_version
@@ -145,6 +145,7 @@ def run_eval(data_root = '/tmp/workspace/COCO2017/train/val2017',
         raise FileNotFoundError(f"{ckpt_folder} is not a filename.")
         
     LOG('Dataset Creating')
+
     ds = create_yolo_dataset(data_root, ann_file, is_training=False, batch_size=per_batch_size,
                              device_num=1, rank=0, shuffle=False, config=config)
     
