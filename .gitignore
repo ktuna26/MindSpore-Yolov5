@@ -136,3 +136,35 @@ dmypy.json
 
 # Cython debug symbols
 cython_debug/
+
+# PyACL
+*.om
+*.pth
+*.h5
+*.tflite
+__pycache__
+kernel_meta
+*.bin
+.ipynb_checkpoints
+build
+#*.jpg
+*.h264
+*.h265
+*.caffemodel
+*.so
+*.o
+*.pb
+*.run
+*.mp4
+*.onnx
+*.pt
+#*.json
+train/
+train_parellel0/
+train_parellel1/
+train_parellel2/
+train_parellel3/
+train_parellel4/
+train_parellel5/
+train_parellel6/
+train_parellel7/

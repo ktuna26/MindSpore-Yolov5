@@ -1,0 +1,6 @@
+numpy
+pillow
+opencv-python
+pycocotools
+onnx
+onnxruntime
