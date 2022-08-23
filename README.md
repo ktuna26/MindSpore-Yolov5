@@ -226,11 +226,14 @@ After training, you'll get some checkpoint files under the **outputs** folder by
 
 ### Distributed Training
 
-Distributed training example(8p) by shell script:
+Distributed training example(8p & 2p) by shell script:
 
 ```bash
 # For Ascend device, distributed training example(8p) by shell script
 bash run_distribute_train.sh [DATASET_PATH] [RANK_TABLE_FILE]
+
+# For Ascend device, distributed training example(2p) by shell script
+bash run_2npu_distribute_train.sh [DATASET_PATH] [RANK_TABLE_FILE]
 
 # For GPU device, distributed training example(8p) by shell script
 bash run_distribute_train_gpu.sh [DATASET_PATH] [RANK_SIZE]
@@ -281,6 +284,17 @@ Average Recall (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.395
 Average Recall (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.619
 Average Recall (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.677
 2020-12-21 17:16:40,322:INFO:testing cost time 0.35h
+```
+#### Visualize Training using [MindInsight](https://www.mindspore.cn/mindinsight/docs/en/r1.8/index.html)
+
+
+```bash
+# For Ascend device, distributed training start visualizing
+mindinsight start --port 9191 --summary-base-dir /mind-spore-yolov5/scripts/summary/
+
+# For Ascend device, distributed training stop visualizing
+mindinsight stop --port 9191
+
 ```
 
 ## Inference Process
