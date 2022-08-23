@@ -65,20 +65,20 @@ def run_eval(data_root = '/tmp/workspace/COCO2017/train/val2017',
             ann_file ="/tmp/workspace/COCO2017/train/annotations/instances_val2017.json",
             yolov5_version = "yolov5s",
             device = 'CPU',
-            ckpt_folder = '/tmp/mindspore/model',
+            ckpt_file = '/tmp/mindspore/model',
             batch_limitter = 10,
             epoches = 1,
             per_batch_size = 32,
             test_img_shape = [640, 640],
             test_ignore_threshold =  0.001,
-            config_mode = False
+            config_path = None
             ):
     
     # Path to files from config file data_root file and annotations file
-    if config_mode:
+    if config_path:
         LOG(f'=================CONFIG MODE ON=================')
         
-        data_root = config.data_root
+        data_root = config.eval_data_dir
         LOG(f'Data Obtained from {data_root}')
         
         
@@ -86,8 +86,8 @@ def run_eval(data_root = '/tmp/workspace/COCO2017/train/val2017',
         LOG(f'Annotations File Obtained from {ann_file}')
         
         # Path to your pretrained confil folder
-        ckpt_folder = config.pretrained
-        LOG(f'Checkpoints Folder Obtained from {ckpt_folder}')
+        ckpt_file = config.pretrained
+        LOG(f'Checkpoints Folder Obtained from {ckpt_file}')
         
         # Your device from config file
         # device = config.device_target
@@ -121,17 +121,18 @@ def run_eval(data_root = '/tmp/workspace/COCO2017/train/val2017',
     network = YOLOV5(is_training = False, version = dict_version[yolov5_version])
     
     # Taking ckpt file by looking its extension, otherwise it takes latest one in the folder
-    if ckpt_folder[-4:] == 'ckpt':
-        LOG(f'Your .ckpt File is {ckpt_folder}')
+    if ckpt_file[-4:] == 'ckpt':
+        LOG(f'Your .ckpt File is {ckpt_file}')
         pass
     else:
-        ckpt_folder = sorted(glob(f'{ckpt_folder}/*.ckpt'), key=os.path.getmtime)[-1]
-        LOG(f'Your .ckpt Folder is {ckpt_folder}')
+        print(f'\n\n\n===\n{ckpt_file}\n===\n\n\n')
+        ckpt_file = sorted(glob(f'{ckpt_file}/*.ckpt'), key=os.path.getmtime)[-1]
+        LOG(f'Your .ckpt Folder is {ckpt_file}')
 
-    if os.path.isfile(ckpt_folder):
-        load_parameters(network, ckpt_folder)
+    if os.path.isfile(ckpt_file):
+        load_parameters(network, ckpt_file)
     else:
-        raise FileNotFoundError(f"{ckpt_folder} is not a filename.")
+        raise FileNotFoundError(f"{ckpt_file} is not a filename.")
         
     LOG('Dataset Creating')
 
@@ -184,8 +185,8 @@ def run_eval(data_root = '/tmp/workspace/COCO2017/train/val2017',
             break
 
         # Printing process every 10 step with adhjusted percentage
-        if index % 3 == 0:
-            PROCESS(f'Current Process: %{index / ds.get_dataset_size() * 100:.2f} done')
+        if index % 2 == 0:
+            PROCESS(f'Current Process: %{index / batch_limitter * 100:.2f} done')
     PROCESS(f'Current Process: %100 done!!!')
     print('='*50)
 
@@ -227,11 +228,8 @@ def run_eval(data_root = '/tmp/workspace/COCO2017/train/val2017',
 # Argument parsing 
 def parse_opt():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--data_root', default = '/tmp/workspace/COCO2017/train/val2017', help = 'Path to your train file Ex: \'/tmp/workspace/COCO2017/train/val2017\'')
-    parser.add_argument('--ann_file', default = '/tmp/workspace/COCO2017/train/annotations/instances_val2017.json', help = 'Path to annotations file ex: \'/tmp/workspace/COCO2017/train/val2017\'')
-    parser.add_argument('--device', default = 'CPU', help = '"CPU"/"Ascend"')
-    #parser.add_argument('--config_mode', default = False, help = 'Use config file for variables')
-    parser.add_argument('--ckpt_folder', default = '/tmp/mindspore/model', help = 'PAth to ckpt folder Note: Model selects latest code by automaticly. If you give ckpt file, it will take that')
+    parser.add_argument('--config_path', default = None, help = 'Use config file for variables')
+    parser.add_argument('--ckpt_file', default = '/tmp/mindspore/model', help = 'PAth to ckpt folder Note: Model selects latest code by automaticly. If you give ckpt file, it will take that')
     opt = parser.parse_args()
     print(opt)
     return opt
