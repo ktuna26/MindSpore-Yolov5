@@ -51,6 +51,7 @@ filter_weight: False
 
 # Eval options
 pretrained: ""
+eval_data_dir: ""
 log_path: "outputs/"
 ann_val_file: ""
 eval_nms_thresh: 0.6
