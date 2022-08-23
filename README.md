@@ -129,38 +129,56 @@ Note the default_config.yaml is the default parameters for yolov5s on 8p. The `b
 ## [Script Parameters](#contents)
 
 ```text
-Major parameters in train.py are:
+# Help description for each configuration
+# Train options
+data_dir: "Train dataset directory."
+per_batch_size: "Batch size for Training."
+pretrained_backbone: "The ckpt file of CspDarkNet53."
+resume_yolov5: "The ckpt file of YOLOv5, which used to fine tune."
+pretrained_checkpoint: "The ckpt file of YOLOv5CspDarkNet53."
+lr_scheduler: "Learning rate scheduler, options: exponential, cosine_annealing."
+lr: "Learning rate."
+lr_epochs: "Epoch of changing of lr changing, split with ','."
+lr_gamma: "Decrease lr by a factor of exponential lr_scheduler."
+eta_min: "Eta_min in cosine_annealing scheduler."
+T_max: "T-max in cosine_annealing scheduler."
+max_epoch: "Max epoch num to train the model."
+warmup_epochs: "Warmup epochs."
+weight_decay: "Weight decay factor."
+momentum: "Momentum."
+loss_scale: "Static loss scale."
+label_smooth: "Whether to use label smooth in CE."
+label_smooth_factor: "Smooth strength of original one-hot."
+log_interval: "Logging interval steps."
+ckpt_path: "Checkpoint save location."
+ckpt_interval: "Save checkpoint interval."
+is_save_on_master: "Save ckpt on master or all rank, 1 for master, 0 for all ranks."
+is_distributed: "Distribute train or not, 1 for yes, 0 for no."
+bind_cpu: "Whether bind cpu when distributed training."
+device_num: "Device numbers per server"
+rank: "Local rank of distributed."
+group_size: "World size of device."
+need_profiler: "Whether use profiler. 0 for no, 1 for yes."
+resize_rate: "Resize rate for multi-scale training."
+ann_file: "path to annotation"
+each_multiscale: "Apply multi-scale for each scale"
+labels: "the label of train data"
+multi_label: "use multi label to nms"
+multi_label_thresh: "multi label thresh"
 
-optional arguments:
+# Eval options
+pretrained: "model_path, local pretrained model to load"
+log_path: "checkpoint save location"
+ann_val_file: "path to annotation"
 
-  --device_target       device where the code will be implemented: "Ascend", default is "Ascend"
-  --data_dir            Train dataset directory.
-  --per_batch_size      Batch size for Training. Default: 32(1p) 16(Ascend 8p) 32(GPU 8p).
-  --resume_yolov5       The ckpt file of YOLOv5, which used to fine tune.Default: ""
-  --lr_scheduler        Learning rate scheduler, options: exponential,cosine_annealing.
-                        Default: cosine_annealing
-  --lr                  Learning rate. Default: 0.01(1p) 0.02(Ascend 8p) 0.025(GPU 8p)
-  --lr_epochs           Epoch of changing of lr changing, split with ",". Default: '220,250'
-  --lr_gamma            Decrease lr by a factor of exponential lr_scheduler. Default: 0.1
-  --eta_min             Eta_min in cosine_annealing scheduler. Default: 0.
-  --t_max               T-max in cosine_annealing scheduler. Default: 300(8p)
-  --max_epoch           Max epoch num to train the model. Default: 300(8p)
-  --warmup_epochs       Warmup epochs. Default: 20(8p)
-  --weight_decay        Weight decay factor. Default: 0.0005
-  --momentum            Momentum. Default: 0.9
-  --loss_scale          Static loss scale. Default: 64
-  --label_smooth        Whether to use label smooth in CE. Default:0
-  --label_smooth_factor Smooth strength of original one-hot. Default: 0.1
-  --log_interval        Logging interval steps. Default: 100
-  --ckpt_path           Checkpoint save location. Default: outputs/
-  --is_distributed      Distribute train or not, 1 for yes, 0 for no. Default: 0
-  --rank                Local rank of distributed. Default: 0
-  --group_size          World size of device. Default: 1
-  --need_profiler       Whether use profiler. 0 for no, 1 for yes. Default: 0
-  --training_shape      Fix training shape. Default: ""
-  --resize_rate         Resize rate for multi-scale training. Default: 10
-  --bind_cpu            Whether bind cpu when distributed training. Default: True
-  --device_num          Device numbers per server. Default: 8
+# Export options
+device_id: "Device id for export"
+batch_size: "batch size for export"
+testing_shape: "shape for test"
+ckpt_file: "Checkpoint file path for export"
+file_name: "output file name for export"
+file_format: "file format for export"
+result_files: 'path to 310 infer result floder'
 ```
 
 ## [Training Process](#contents)
@@ -244,24 +262,8 @@ The above shell script will run distribute training in the background. You can v
 ...
 ```
 
-## [Evaluation Process](#contents)
 
-### Evaluation
 
-Before running the command below, please check the checkpoint path used for evaluation. The file **yolov5.ckpt** used in the  follow script is the last saved checkpoint file, but we renamed it to "yolov5.ckpt".
-
-```shell
-# run evaluation by python command
-python eval.py \
-    --data_dir=xxx/dataset \
-    --pretrained_checkpoint=xxx/yolov5.ckpt \
-    --eval_shape=640 > log.txt 2>&1 &
-OR
-# run evaluation by shell script
-bash run_eval.sh [DATASET_PATH] [CHECKPOINT_PATH]
-```
-
-The above python command will run in the background. You can view the results through the file "log.txt". The mAP of the test dataset will be as follows:
 
 ```text
 # log.txt
@@ -325,22 +327,6 @@ Average Recall (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.395
 Average Recall (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.619
 Average Recall (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.677
 ```
-
-### [Export ONNX](#contents)
-
-- Export your model to ONNX:  
-
-  ```shell
-  python export.py --ckpt_file /path/to/yolov5.ckpt --file_name /path/to/yolov5.onnx --file_format ONNX
-  ```
-
-### Run ONNX evaluation
-
-- Run ONNX evaluation from yolov5 directory:
-
-  ```shell
-  bash scripts/run_eval_onnx.sh <DATA_DIR> <ONNX_MODEL_PATH> [<DEVICE_TARGET>]
-  ```
 
 ### result
 
