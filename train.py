@@ -65,6 +65,7 @@ def train_preprocess():
     # logger module is managed by config, it is used in other function. e.x. config.logger.info("xxx")
     config.logger = get_logger(config.output_dir, config.rank)
     config.logger.save_args(config)
+    
 
 
 @moxing_wrapper(pre_process=modelarts_pre_process, post_process=modelarts_post_process, pre_args=[config])
@@ -95,8 +96,16 @@ def run_train():
     data_loader = ds.create_tuple_iterator(do_copy=False)
     first_step = True
     t_end = time.time()
+
+    '''DISTRIBUTED Training'''
+    # If you are using multiple NPU training scenario you should add this 2 line of code. 
+    # It is provides to see your all summaries in one directory. You can switch directories easily while using mindInsight visualizer.
+    # from mindspore.communication import get_rank
+    # summary_dir = "../summary/summary_dir" + str(get_rank()) # It will be created in the scripts/ directory.
+    '''DISTRIBUTED Training'''
+    summary_dir = '../summary/summary_dir/'
     ###########################################################################################
-    with ms.train.summary.SummaryRecord('./summary_dir/', network=network) as summary_record:
+    with ms.train.summary.SummaryRecord(summary_dir, network=network) as summary_record:
         for epoch_idx in range(config.max_epoch):
             for step_idx, data in enumerate(data_loader):
                 images = data[0]
@@ -111,8 +120,10 @@ def run_train():
                     time_used = time.time() - t_end
 
                     #########################################################################
+                    summary_record.set_mode('train')
                     summary_record.add_value('scalar', 'loss', loss)
-                    summary_record.add_value('scalar','learning rate',ms.Tensor(lr[step_idx]))
+                    summary_record.add_value('scalar', 'dummyLoss', loss+40)
+                    # You can use add_value for adding new variables to watch. validationLoss, ... etc.
                     summary_record.record(step_idx + 1)
                     #########################################################################
 
