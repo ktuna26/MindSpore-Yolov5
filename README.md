@@ -266,6 +266,12 @@ The above shell script will run distribute training in the background. You can v
 ```
 
 
+## [Evaluation Process](#contents)
+
+### Evaluation
+
+Checkpoint 
+Before running the command below, please check the checkpoint path used for evaluation. The file **yolov5.ckpt** used in the  follow script is the last saved checkpoint file, but we renamed it to "yolov5.ckpt".
 
 
 ```text
