@@ -12,11 +12,9 @@
         - [Training](#training)
         - [Distributed Training](#distributed-training)
     - [Inference Process](#inference-process)
-        - [Export MindIR](#export-mindir)
+        - [Export AIR](#export-air)
         - [Infer on Ascend310](#infer-on-ascend310)
         - [result](#result)
-        - [Export ONNX](#export-onnx)
-        - [Run ONNX evaluation](#run-onnx-evaluation)
         - [result](#result)
 - [Model Description](#model-description)
 - [Performance](#performance)  
@@ -65,18 +63,14 @@ bash run_standalone_train.sh [DATASET_PATH]
 # For Ascend device, distributed training example(8p) by shell script
 bash run_distribute_train.sh [DATASET_PATH] [RANK_TABLE_FILE]
 
-# For GPU device, distributed training example(8p) by shell script
-bash run_distribute_train_gpu.sh [DATASET_PATH] [RANK_SIZE]
 ```
 
 ```bash
-# run evaluation on Ascend/GPU by python command
-python eval.py \
-    --device_target="Ascend" \ # Ascend or GPU
-    --data_dir=xxx/dataset \
-    --yolov5_version='yolov5s' \
-    --pretrained_checkpoint="***/*.ckpt" \
-    --eval_shape=640 > log.txt 2>&1 &
+# run evaluation on Ascend by python command
+
+python evaluate.py \
+    --config_path [CONFIG_FILE_PATH] \
+    --ckpt_file [CHECKPOINT_PATH] > log_eval.txt 2>&1 &
 ```
 
 ```bash
@@ -91,39 +85,46 @@ Note the default_config.yaml is the default parameters for yolov5s on 8p. The `b
 ## [Script and Sample Code](#contents)
 
 ```text
-├── model_zoo
-    ├── README.md                              // descriptions about all the models
-    ├── yolov5
-        ├── README.md                          // descriptions about yolov5
-        ├── scripts
-        │   ├──docker_start.sh                 // shell script for docker start
-        │   ├──run_distribute_train.sh         // launch distributed training(8p) in ascend
-        │   ├──run_distribute_train_gpu.sh     // launch distributed training(8p) in GPU
-        │   ├──run_standalone_train.sh         // launch 1p training
-        │   ├──run_infer_310.sh                // shell script for evaluation on 310
-        │   ├──run_eval.sh                     // shell script for evaluation
-        │   ├──run_eval_onnx.sh                // shell script for onnx evaluation
-        ├──model_utils
-        │   ├──config.py                       // getting config parameters
-        │   ├──device_adapter.py               // getting device info
-        │   ├──local_adapter.py                // getting device info
-        │   ├──moxing_adapter.py               // Decorator
-        ├── src
-        │   ├──backbone.py                     // backbone of network
-        │   ├──distributed_sampler.py          // iterator of dataset
-        │   ├──initializer.py                  // initializer of parameters
-        │   ├──logger.py                       // log function
-        │   ├──loss.py                         // loss function
-        │   ├──lr_scheduler.py                 // generate learning rate
-        │   ├──transforms.py                   // Preprocess data
-        │   ├──util.py                         // util function
-        │   ├──yolo.py                         // yolov5 network
-        │   ├──yolo_dataset.py                 // create dataset for YOLOV5
-        ├── default_config.yaml                // parameter configuration(yolov5s 8p)
-        ├── train.py                           // training script
-        ├── eval.py                            // evaluation script
-        ├── eval_onnx.py                       // ONNX evaluation script
-        ├── export.py                          // export script
+
+├── ascend310_infer                    // asynchronous inference on NPU  
+│   ├──data                            
+│   |──model
+│   ├──utils
+│   |──weights                           
+│   ├──pt_yolov5_without_dvpp.ipynb    // demo of asynchronous inference 
+├── scripts
+│   ├──docker_start.sh                 // shell script for docker start
+│   ├──run_distribute_train.sh         // launch distributed training(8p) in ascend
+│   ├──run_distribute_train_gpu.sh     // launch distributed training(8p) in GPU
+│   ├──run_standalone_train.sh         // launch 1p training
+│   ├──run_infer_310.sh                // shell script for evaluation on 310
+│   ├──run_eval.sh                     // shell script for evaluation
+│   ├──run_eval_onnx.sh                // shell script for onnx evaluation
+├──model_utils
+│   ├──config.py                       // getting config parameters
+│   ├──device_adapter.py               // getting device info
+│   ├──local_adapter.py                // getting device info
+│   ├──moxing_adapter.py               // Decorator
+├── src
+│   ├──backbone.py                     // backbone of network
+│   ├──distributed_sampler.py          // iterator of dataset
+│   ├──initializer.py                  // initializer of parameters
+│   ├──logger.py                       // log function
+│   ├──loss.py                         // loss function
+│   ├──lr_scheduler.py                 // generate learning rate
+│   ├──transforms.py                   // Preprocess data
+│   ├──util.py                         // util function
+│   ├──yolo.py                         // yolov5 network
+│   ├──yolo_dataset.py                 // create dataset for YOLOV5
+├── default_config.yaml                // parameter configuration(yolov5s 8p)
+├── train.py                           // training script
+├── evaluate.py                        // evaluation script
+├── eval_onnx.py                       // ONNX evaluation script
+├── export.py                          // export script
+├── hccl_2p.json                       // hccl file for 2 NPU 
+├── hccl_8p.json                       // hccl file for 8 NPU 
+├── README.md                          // descriptions about yolov5
+
 ```
 
 ## [Script Parameters](#contents)
@@ -190,18 +191,16 @@ For Ascend device, standalone training can be started like this:
 ```shell
 #run training example(1p) by python command
 python train.py \
+    --device_target="Ascend" \
     --data_dir=xxx/dataset \
     --yolov5_version='yolov5s' \
     --is_distributed=0 \
     --lr=0.01 \
-    --T_max=320
+    --T_max=320 \
     --max_epoch=320 \
     --warmup_epochs=4 \
-    --per_batch_size=32 \
-    --lr_scheduler=cosine_annealing > log.txt 2>&1 &
+    --per_batch_size=32 > log.txt 2>&1 &
 ```
-
-You should fine tune the params when run training 1p on GPU
 
 The python command above will run in the background, you can view the results through the file `log.txt`.
 
@@ -234,9 +233,6 @@ bash run_distribute_train.sh [DATASET_PATH] [RANK_TABLE_FILE]
 
 # For Ascend device, distributed training example(2p) by shell script
 bash run_2npu_distribute_train.sh [DATASET_PATH] [RANK_TABLE_FILE]
-
-# For GPU device, distributed training example(8p) by shell script
-bash run_distribute_train_gpu.sh [DATASET_PATH] [RANK_SIZE]
 ```
 
 The above shell script will run distribute training in the background. You can view the results through the file train_parallel[X]/log.txt(Ascend) or distribute_train/nohup.out(GPU). The loss value will be achieved as follows:
@@ -300,12 +296,11 @@ mindinsight start --port 9191 --summary-base-dir /mind-spore-yolov5/scripts/summ
 
 # For Ascend device, distributed training stop visualizing
 mindinsight stop --port 9191
-
 ```
 
 ## Inference Process
 
-### [Export MindIR](#contents)
+### [Export AIR](#contents)
 
 ```shell
 python export.py --ckpt_file [CKPT_PATH] --file_name [FILE_NAME] --file_format [FILE_FORMAT]
@@ -314,20 +309,6 @@ python export.py --ckpt_file [CKPT_PATH] --file_name [FILE_NAME] --file_format [
 The ckpt_file parameter is required,
 `file_format` should be in ["AIR", "MINDIR"]
 
-### Infer on Ascend310
-
-Before performing inference, the mindir file must be exported by `export.py` script. We only provide an example of inference using MINDIR model.
-Current batch_Size can only be set to 1.
-
-```shell
-# Ascend310 inference
-bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [ANN_FILE] [DVPP] [DEVICE_ID]
-```
-
-- `DVPP` is mandatory, and must choose from ["DVPP", "CPU"], it's case-insensitive. The DVPP hardware restricts width 16-alignment and height even-alignment. Therefore, the network needs to use the CPU operator to process images.
-- `DATA_PATH` is mandatory, path of the dataset containing images.
-- `ANN_FILE` is mandatory, path to annotation file.
-- `DEVICE_ID` is optional, default value is 0.
 
 ### result
 
@@ -378,7 +359,7 @@ YOLOv5 on 118K images(The annotation and data format must be the same as coco201
 
 | Parameters                 | YOLOv5s                                                      | YOLOv5s                                                      |
 | -------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
-| Resource                   | Ascend 910 ；CPU 2.60GHz，192cores; Memory, 755G               | GPU NV SMX2 V100-32G                                         |
+| Resource                   | Ascend 910 ；CPU 2.60GHz，192cores; Memory, 755G              | GPU NV SMX2 V100-32G                                         |
 | uploaded Date              | 7/12/2021 (month/day/year)                                   | 9/15/2021 (month/day/year)                                   |
 | MindSpore Version          | 1.2.0                                                        | 1.3.0                                                        |
 | Dataset                    | 118K images                                                  | 118K images                                                  |
