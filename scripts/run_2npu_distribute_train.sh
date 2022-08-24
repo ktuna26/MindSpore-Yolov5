@@ -52,7 +52,7 @@ export RANK_TABLE_FILE=$RANK_TABLE_FILE
 cpus=`cat /proc/cpuinfo| grep "processor"| wc -l`
 avg=`expr $cpus \/ $RANK_SIZE`
 gap=`expr $avg \- 1`
-for((i=0; i<2; i++))
+for((i=0; i<${DEVICE_NUM}; i++))
 do
     start=`expr $i \* $avg`
     end=`expr $start \+ $gap`
