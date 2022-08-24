@@ -105,6 +105,9 @@ def run_eval(data_root = '/tmp/workspace/COCO2017/train/val2017',
         
         # treshold to be ignored
         test_ignore_threshold = config.test_ignore_threshold
+
+        # Limiting how many batches will be used for evauation
+        batch_limitter = config.eval_batch_limit
         
     
 
