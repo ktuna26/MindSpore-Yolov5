@@ -143,18 +143,17 @@ def run_train():
                 ckpt_name = os.path.join(config.output_dir, "yolov5_{}_{}.ckpt".format(epoch_idx + 1, steps_per_epoch))
                 ms.save_checkpoint(network, ckpt_name)
                 
-            if epoch_idx%15 == 0:
+            if epoch_idx%1 == 0:
                 run_eval(data_root = config.data_root,
                         ann_file = config.annFile,
                         yolov5_version = config.yolov5_version,
                         device = 'CPU',
-                        ckpt_folder = config.output_dir,
-                        batch_limitter = 15,
+                        ckpt_file = config.output_dir,
+                        batch_limitter = 2,
                         epoches = epoch_idx,
                         per_batch_size = config.per_batch_size,
                         test_img_shape = config.test_img_shape,
-                        test_ignore_threshold =  config.test_ignore_threshold,
-                        config_mode = False
+                        test_ignore_threshold =  config.test_ignore_threshold
                         )
     ###########################################################################################
     config.logger.info('==========end training===============')
