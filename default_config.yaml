@@ -15,7 +15,8 @@ modelarts_dataset_unzip_name: "coco"
 
 # ==============================================================================
 # Train options
-data_dir: "/data/coco"
+data_dir: "/data/coco" 
+eval_per_step: 1 
 per_batch_size: 32
 yolov5_version: "yolov5s"
 pretrained_backbone: ""
@@ -50,11 +51,12 @@ resize_rate: 10
 filter_weight: False
 
 # Eval options
-pretrained: ""
-eval_data_dir: ""
+pretrained: "" #
+eval_data_dir: "" #
 log_path: "outputs/"
 ann_val_file: ""
 eval_nms_thresh: 0.6
+eval_batch_limit: 2
 ignore_threshold: 0.7
 test_ignore_threshold: 0.001
 multi_label: True
@@ -68,7 +70,7 @@ ckpt_file: ""
 file_name: "yolov5"
 file_format: "MINDIR"
 dataset_path: ""
-ann_file: ""
+ann_file: "" #
 
 
 # Other default config
