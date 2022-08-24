@@ -34,15 +34,15 @@ from model_utils.moxing_adapter import moxing_wrapper, modelarts_pre_process
 
 # Log Functions / CYAN
 def LOG(inp):
-    config.logger.info(f'[\033[96mLOG\033[0m] {inp}')
+    print(f'[\033[96mLOG\033[0m] {inp}')
 
 # Success Functions / GREEN
 def SUCCESS(inp):
-    config.logger.info(f'\033[92mSUCCESS\033[0m {inp}')
+    print(f'\033[92mSUCCESS\033[0m {inp}')
 
 # Process Functions / YELLOW
 def PROCESS(inp):
-    config.logger.info(f'\033[33mPROCESS\033[0m {inp}')
+    print(f'\033[33mPROCESS\033[0m {inp}')
 
 # Loading checkpoint and placing into model. (Model = YOLOV5, File = .ckpt file which selected)
 def load_parameters(network, filename):
@@ -66,7 +66,7 @@ def run_eval(data_root = '/tmp/workspace/COCO2017/train/val2017',
             yolov5_version = "yolov5s",
             device = 'CPU',
             ckpt_file = '/tmp/mindspore/model',
-            batch_limitter = 10,
+            batch_limitter = 2,
             epoches = 1,
             per_batch_size = 32,
             test_img_shape = [640, 640],
@@ -122,6 +122,7 @@ def run_eval(data_root = '/tmp/workspace/COCO2017/train/val2017',
     
     # Taking ckpt file by looking its extension, otherwise it takes latest one in the folder
     if ckpt_file[-4:] == 'ckpt':
+        print(f'\n\n\n===\n{ckpt_file}\n===\n\n\n')
         LOG(f'Your .ckpt File is {ckpt_file}')
         pass
     else:
@@ -196,7 +197,7 @@ def run_eval(data_root = '/tmp/workspace/COCO2017/train/val2017',
     result_file_path = detection.write_result()
 
     # Getting evaluated result 
-    LOG('File Path of the Reult: %s'% (result_file_path))
+    LOG('File Path of the Result: %s'% (result_file_path))
     eval_result = detection.get_eval_result()
 
     # Write output to txt file
@@ -205,6 +206,7 @@ def run_eval(data_root = '/tmp/workspace/COCO2017/train/val2017',
         file.close()
         
     # Save output as JSON
+    LOG('Saving As Json')
     if os.path.exists("./output/evals.json"):
         df = pd.read_json('./output/evals.json')
         new = pd.read_csv('output.txt', names = [f'epoches_{epoches}'], sep=' = ',  header=None, index_col=0)[f'epoches_{epoches}'].values
@@ -218,7 +220,7 @@ def run_eval(data_root = '/tmp/workspace/COCO2017/train/val2017',
     # Remove thrash txt file
     if os.path.exists("./output.txt"):
           os.remove("./output.txt")
-
+    LOG('Step Saved')
     # Displaying output of the result on terminal
     cost_time = time.time() - start_time
     eval_log_string = '\n================== Eval Result of the Process ==================\n' + eval_result
@@ -229,7 +231,7 @@ def run_eval(data_root = '/tmp/workspace/COCO2017/train/val2017',
 def parse_opt():
     parser = argparse.ArgumentParser()
     parser.add_argument('--config_path', default = None, help = 'Use config file for variables')
-    parser.add_argument('--ckpt_file', default = '/tmp/mindspore/model', help = 'PAth to ckpt folder Note: Model selects latest code by automaticly. If you give ckpt file, it will take that')
+    #parser.add_argument('--ckpt_file', default = '/tmp/mindspore/model', help = 'PAth to ckpt folder Note: Model selects latest code by automaticly. If you give ckpt file, it will take that')
     opt = parser.parse_args()
     print(opt)
     return opt
