@@ -22,6 +22,7 @@ import pandas as pd
 
 import mindspore as ms
 
+from src.logger import get_logger
 from src.yolo import YOLOV5
 from src.util import DetectionEngine
 from src.yolo_dataset import create_yolo_dataset
@@ -32,17 +33,18 @@ from model_utils.config import config
 from model_utils.moxing_adapter import moxing_wrapper, modelarts_pre_process
 
 
+config.logger = get_logger(config.output_dir, 0)
 # Log Functions / CYAN
 def LOG(inp):
-    print(f'[\033[96mLOG\033[0m] {inp}')
+    config.logger.info(f'\033[96mLOG\033[0m {inp}')
 
 # Success Functions / GREEN
 def SUCCESS(inp):
-    print(f'\033[92mSUCCESS\033[0m {inp}')
+    config.logger.info(f'\033[92mSUCCESS\033[0m {inp}')
 
 # Process Functions / YELLOW
 def PROCESS(inp):
-    print(f'\033[33mPROCESS\033[0m {inp}')
+    config.logger.info(f'\033[33mPROCESS\033[0m {inp}')
 
 # Loading checkpoint and placing into model. (Model = YOLOV5, File = .ckpt file which selected)
 def load_parameters(network, filename):
@@ -122,11 +124,9 @@ def run_eval(data_root = '/tmp/workspace/COCO2017/train/val2017',
     
     # Taking ckpt file by looking its extension, otherwise it takes latest one in the folder
     if ckpt_file[-4:] == 'ckpt':
-        print(f'\n\n\n===\n{ckpt_file}\n===\n\n\n')
         LOG(f'Your .ckpt File is {ckpt_file}')
         pass
     else:
-        print(f'\n\n\n===\n{ckpt_file}\n===\n\n\n')
         ckpt_file = sorted(glob(f'{ckpt_file}/*.ckpt'), key=os.path.getmtime)[-1]
         LOG(f'Your .ckpt Folder is {ckpt_file}')
 
@@ -189,7 +189,6 @@ def run_eval(data_root = '/tmp/workspace/COCO2017/train/val2017',
         if index % 2 == 0:
             PROCESS(f'Current Process: %{index / batch_limitter * 100:.2f} done')
     PROCESS(f'Current Process: %100 done!!!')
-    print('='*50)
 
     # Mean Absolute Precision Calculation with outputs. This process took longer than others
     LOG(f'mAP is Calculating... Note: This process may take a while.')
