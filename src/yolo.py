@@ -42,13 +42,6 @@ class YOLO(nn.Cell):
         self.back_block3 = YoloBlock(shape[5], self.config.out_channel)
 
         self.concat = ops.Concat(axis=1)
-        
-        #####################################################################
-        self.tensor_summary = ops.TensorSummary()
-        # Init ImageSummary
-        # self.image_summary = ops.ImageSummary()
-        #####################################################################
-
 
     def construct(self, x):
         """
@@ -62,14 +55,7 @@ class YOLO(nn.Cell):
 
         feature_map1, feature_map2, feature_map3 = self.backbone(x)
 
-        #####################################################################
-        # self.image_summary("Image", feature_map3)
-        
-        c1 = self.conv1(feature_map3) # this line already exist.
-        
-        self.tensor_summary("after_conv1", c1)
-        #####################################################################
-        
+        c1 = self.conv1(feature_map3)
         ups1 = ops.ResizeNearestNeighbor((img_height // 16, img_width // 16))(c1)
         c2 = self.concat((ups1, feature_map2))
         c3 = self.CSP5(c2)
