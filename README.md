@@ -45,9 +45,9 @@ Note that you can run the scripts with **COCO2017 **or any other datasets with t
 After installing MindSpore via the official website, you can start training and evaluation as follows:
 
 ```bash
-#run training example(1p) on Ascend/GPU by python command
+#run training example(1p) on Ascend by python command
 python train.py \
-    --device_target="Ascend" \ # Ascend or GPU
+    --device_target="Ascend" \ 
     --data_dir=xxx/dataset \
     --is_distributed=0 \
     --yolov5_version='yolov5s' \
@@ -57,8 +57,11 @@ python train.py \
 ```
 
 ```bash
-# run 1p by shell script, please change `device_target` in config file to run on Ascend/GPU, and change `T_max`, `max_epoch`, `warmup_epochs` refer to contents of notes
+# run 1p by shell script, please change `device_target` in config file to run on Ascend, and change `T_max`, `max_epoch`, `warmup_epochs` refer to contents of notes
 bash run_standalone_train.sh [DATASET_PATH]
+
+# For Ascend device, distributed training example(2p) by shell script
+bash run_2npu_distribute_train.sh [DATASET_PATH] [RANK_TABLE_FILE]
 
 # For Ascend device, distributed training example(8p) by shell script
 bash run_distribute_train.sh [DATASET_PATH] [RANK_TABLE_FILE]
@@ -66,7 +69,7 @@ bash run_distribute_train.sh [DATASET_PATH] [RANK_TABLE_FILE]
 ```
 
 ```bash
-# run evaluation on CPU by python command
+# run evaluation on Ascend by python command
 
 python evaluate.py \
     --config_path [CONFIG_FILE_PATH] \
@@ -74,11 +77,11 @@ python evaluate.py \
 ```
 
 ```bash
-# run evaluation by shell script, please change `device_target` in config file to run on Ascend/GPU
+# run evaluation by shell script, please change `device_target` in config file to run on Ascend
 bash run_evaluate.sh [CONFIG_FILE_PATH] [CHECKPOINT_PATH]
 ```
 
-Note the default_config.yaml is the default parameters for yolov5s on 8p. The `batchsize` and `lr` are different on Ascend and GPU, see the settings in `scripts/run_distribute_train.sh` or `scripts/run_distribute_train_gpu.sh`.
+Note the default_config.yaml is the default parameters for yolov5s on 8p. The `batchsize` and `lr` are different on Ascend, see the settings in `scripts/run_distribute_train.sh`
 
 # [Script Description](#contents)
 
@@ -95,11 +98,10 @@ Note the default_config.yaml is the default parameters for yolov5s on 8p. The `b
 ├── scripts
 │   ├──docker_start.sh                 // shell script for docker start
 │   ├──run_distribute_train.sh         // launch distributed training(8p) in ascend
-│   ├──run_distribute_train_gpu.sh     // launch distributed training(8p) in GPU
+│   ├──run_2npu_distribute_train.sh    // launch distributed training(2p) in ascend
 │   ├──run_standalone_train.sh         // launch 1p training
 │   ├──run_infer_310.sh                // shell script for evaluation on 310
 │   ├──run_eval.sh                     // shell script for evaluation
-│   ├──run_eval_onnx.sh                // shell script for onnx evaluation
 ├──model_utils
 │   ├──config.py                       // getting config parameters
 │   ├──device_adapter.py               // getting device info
@@ -235,7 +237,7 @@ bash run_distribute_train.sh [DATASET_PATH] [RANK_TABLE_FILE]
 bash run_2npu_distribute_train.sh [DATASET_PATH] [RANK_TABLE_FILE]
 ```
 
-The above shell script will run distribute training in the background. You can view the results through the file train_parallel[X]/log.txt(Ascend) or distribute_train/nohup.out(GPU). The loss value will be achieved as follows:
+The above shell script will run distribute training in the background. You can view the results through the file train_parallel[X]/log.txt(Ascend). The loss value will be achieved as follows:
 
 ```text
 # distribute training result(8p, dynamic shape)
@@ -357,34 +359,34 @@ Average Recall (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.677
 
 YOLOv5 on 118K images(The annotation and data format must be the same as coco2017)
 
-| Parameters                 | YOLOv5s                                                      | YOLOv5s                                                      |
-| -------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
-| Resource                   | Ascend 910 ；CPU 2.60GHz，192cores; Memory, 755G              | GPU NV SMX2 V100-32G                                         |
-| uploaded Date              | 7/12/2021 (month/day/year)                                   | 9/15/2021 (month/day/year)                                   |
-| MindSpore Version          | 1.2.0                                                        | 1.3.0                                                        |
-| Dataset                    | 118K images                                                  | 118K images                                                  |
-| Training Parameters        | epoch=300, batch_size=8, lr=0.02,momentum=0.9,warmup_epoch=20| epoch=300, batch_size=32, lr=0.025, warmup_epoch=20, 8p      |
-| Optimizer                  | Momentum                                                     | Momentum                                                     |
-| Loss Function              | Sigmoid Cross Entropy with logits, Giou Loss                 | Sigmoid Cross Entropy with logits, Giou Loss                 |
-| outputs                    | boxes and label                                              | boxes and label                                              |
-| Loss                       | 111.970097                                                   | 85                                                           |
-| Speed                      | 8p about 450 FPS                                             | 8p about 290 FPS                                             |
-| Total time                 | 8p 21h28min                                                  | 8p 35h                                                       |
-| Checkpoint for Fine tuning | 53.62M (.ckpt file)                                          | 58.87M (.ckpt file)                                          |
-| Scripts                    | https://gitee.com/mindspore/models/tree/master/official/cv/yolov5 | https://gitee.com/mindspore/models/tree/master/official/cv/yolov5 |
+| Parameters                 | YOLOv5s                                                           | 
+| -------------------------- | ------------------------------------------------------------------|
+| Resource                   | Ascend 910 ；CPU 2.60GHz，192cores; Memory, 755G                   |
+| uploaded Date              | 7/12/2021 (month/day/year)                                        |
+| MindSpore Version          | 1.2.0                                                             |
+| Dataset                    | 118K images                                                       |
+| Training Parameters        | epoch=300, batch_size=8, lr=0.02,momentum=0.9,warmup_epoch=20     |
+| Optimizer                  | Momentum                                                          |
+| Loss Function              | Sigmoid Cross Entropy with logits, Giou Loss                      |
+| outputs                    | boxes and label                                                   |
+| Loss                       | 111.970097                                                        |
+| Speed                      | 8p about 450 FPS                                                  |
+| Total time                 | 8p 21h28min                                                       |
+| Checkpoint for Fine tuning | 53.62M (.ckpt file)                                               |
+| Scripts                    | https://gitee.com/mindspore/models/tree/master/official/cv/yolov5 | 
 
 ### Inference Performance
 
-| Parameters          | YOLOv5s                                        | YOLOv5s                                      |
-| ------------------- | -----------------------------------------------| ---------------------------------------------|
-| Resource            | Ascend 910 ；CPU 2.60GHz，192cores; Memory, 755G | GPU NV SMX2 V100-32G                         |
-| Uploaded Date       | 7/12/2021 (month/day/year)                     | 9/15/2021 (month/day/year)                   |
-| MindSpore Version   | 1.2.0                                          | 1.3.0                                        |
-| Dataset             | 20K images                                     | 20K images                                   |
-| batch_size          | 1                                              | 1                                            |
-| outputs             | box position and sorces, and probability       | box position and sorces, and probability     |
-| Accuracy            | mAP >= 36.7%(shape=640)                        | mAP >= 36.7%(shape=640)                      |
-| Model for inference | 56.67M (.ckpt file)                            | 58.87M (.ckpt file)                          |
+| Parameters          | YOLOv5s                                        |
+| ------------------- | -----------------------------------------------| 
+| Resource            | Ascend 910 ；CPU 2.60GHz，192cores; Memory, 755G |
+| Uploaded Date       | 7/12/2021 (month/day/year)                     | 
+| MindSpore Version   | 1.2.0                                          | 
+| Dataset             | 20K images                                     |
+| batch_size          | 1                                              | 
+| outputs             | box position and sorces, and probability       |
+| Accuracy            | mAP >= 36.7%(shape=640)                        | 
+| Model for inference | 56.67M (.ckpt file)                            |
 
 ### Transfer Learning
 
