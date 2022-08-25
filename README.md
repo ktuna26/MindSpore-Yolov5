@@ -390,6 +390,19 @@ YOLOv5 on 118K images(The annotation and data format must be the same as coco201
 
 ### Transfer Learning
 
+```bash
+#run training example(1p) with pretrained model on Ascend by python command
+python train.py \
+    --device_target="Ascend" \
+    --data_dir=xxx/dataset \
+    --is_distributed=0 \
+    --yolov5_version='yolov5s' \
+    --lr=0.01 \
+    --max_epoch=320 \
+    --warmup_epochs=4 \
+    --pretrained_checkpoint=/path/of/ckpt/model
+```
+
 # [Description of Random Situation](#contents)
 
 In dataset.py, we set the seed inside “create_dataset" function. We also use random seed in train.py.
