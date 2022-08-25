@@ -61,6 +61,8 @@ pretrained: ""
 eval_data_dir: "" 
 log_path: "outputs/"
 ann_val_file: ""
+# Device to run evaluations
+eval_device: "CPU"
 eval_nms_thresh: 0.6
 ## Amount of how many batch will you use for evaluations.
 eval_batch_limit: 2
