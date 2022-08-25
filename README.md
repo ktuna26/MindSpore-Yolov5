@@ -66,7 +66,7 @@ bash run_distribute_train.sh [DATASET_PATH] [RANK_TABLE_FILE]
 ```
 
 ```bash
-# run evaluation on Ascend by python command
+# run evaluation on CPU by python command
 
 python evaluate.py \
     --config_path [CONFIG_FILE_PATH] \
@@ -75,7 +75,7 @@ python evaluate.py \
 
 ```bash
 # run evaluation by shell script, please change `device_target` in config file to run on Ascend/GPU
-bash run_eval.sh [DATASET_PATH] [CHECKPOINT_PATH]
+bash run_evaluate.sh [CONFIG_FILE_PATH] [CHECKPOINT_PATH]
 ```
 
 Note the default_config.yaml is the default parameters for yolov5s on 8p. The `batchsize` and `lr` are different on Ascend and GPU, see the settings in `scripts/run_distribute_train.sh` or `scripts/run_distribute_train_gpu.sh`.
