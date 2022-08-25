@@ -145,17 +145,18 @@ def run_train():
                 ms.save_checkpoint(network, ckpt_name)
                 
             if epoch_idx%config.eval_per_step == 0:
-                run_eval(data_root = config.data_root,
-                        ann_file = config.annFile,
-                        yolov5_version = config.yolov5_version,
-                        device = 'CPU',
-                        ckpt_file = config.output_dir,
-                        batch_limitter = config.eval_batch_limit,
-                        epoches = epoch_idx,
-                        per_batch_size = config.per_batch_size,
-                        test_img_shape = config.test_img_shape,
-                        test_ignore_threshold =  config.test_ignore_threshold
-                        )
+                # Precision and Recall Scores Which Returned From Evaluation 
+                eval_scores = run_eval(data_root = config.data_root,
+                                        ann_file = config.annFile,
+                                        yolov5_version = config.yolov5_version,
+                                        device = 'CPU',
+                                        ckpt_file = config.output_dir,
+                                        batch_limitter = config.eval_batch_limit,
+                                        epoches = epoch_idx,
+                                        per_batch_size = config.per_batch_size,
+                                        test_img_shape = config.test_img_shape,
+                                        test_ignore_threshold =  config.test_ignore_threshold
+                                        )
     ###########################################################################################
     config.logger.info('==========end training===============')
 
