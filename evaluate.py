@@ -211,13 +211,13 @@ def run_eval(data_root = '/tmp/workspace/COCO2017/train/val2017',
     LOG('Saving As Json')
     if os.path.exists("./output/evals.json"):
         df = pd.read_json('./output/evals.json')
-        new = pd.read_csv('output.txt', names = [f'epoches_{epoches}'], sep=' = ',  header=None, index_col=0)[f'epoches_{epoches}'].values
-        df[f'epoches_{epoches}'] = new
+        new = pd.read_csv('output.txt', names = [f'epoches_{epoches}'], sep=' = ',  header=None, index_col=0)[f'epoches_{epoches}']
+        df[f'epoches_{epoches}'] = new.values
         df = df.T
         df.to_json(r'./output/evals.json', orient='index')
     else:
-        df = pd.read_csv('./output.txt', names = [f'epoches_{epoches}'], sep=' = ',  header=None, index_col=0).T
-        df.to_json(r'./output/evals.json', orient='index')
+        new = pd.read_csv('./output.txt', names = [f'epoches_{epoches}'], sep=' = ',  header=None, index_col=0).T
+        new.to_json(r'./output/evals.json', orient='index')
     
     # Remove thrash txt file
     if os.path.exists("./output.txt"):
@@ -228,6 +228,8 @@ def run_eval(data_root = '/tmp/workspace/COCO2017/train/val2017',
     eval_log_string = '\n================== Eval Result of the Process ==================\n' + eval_result
     LOG(eval_log_string)
     LOG('testing cost time %.2f h'% (cost_time / 3600.))
+    
+    return new.to_dict()
 
 # Argument parsing 
 def parse_opt():
