@@ -108,6 +108,9 @@ def run_eval(data_root = '/tmp/workspace/COCO2017/train/val2017',
 
         # Limiting how many batches will be used for evauation
         batch_limitter = config.eval_batch_limit
+
+        # Evaluation device type from config file
+        device = config.eval_device
         
     
 
