@@ -16,7 +16,7 @@
 
 if [ $# != 2 ]
 then
-    echo "Usage: bash run_eval.sh [DATASET_PATH] [CHECKPOINT_PATH]"
+    echo "Usage: bash run_eval.sh [CONFIG_FILE_PATH] [CHECKPOINT_PATH]"
 exit 1
 fi
 
@@ -27,14 +27,14 @@ get_real_path(){
     echo "$(realpath -m $PWD/$1)"
   fi
 }
-DATASET_PATH=$(get_real_path $1)
+CONFIG_FILE_PATH=$(get_real_path $1)
 CHECKPOINT_PATH=$(get_real_path $2)
-echo $DATASET_PATH
+echo $CONFIG_FILE_PATH
 echo $CHECKPOINT_PATH
 
-if [ ! -d $DATASET_PATH ]
+if [ ! -d $CONFIG_FILE_PATH ]
 then
-    echo "error: DATASET_PATH=$PATH1 is not a directory"
+    echo "error: CONFIG_FILE_PATH=$PATH1 is not a directory"
 exit 1
 fi
 
@@ -61,7 +61,8 @@ cp -r ../model_utils ./eval
 cd ./eval || exit
 env > env.log
 echo "start inferring for device $DEVICE_ID"
-python eval.py \
-    --data_dir=$DATASET_PATH \
-    --pretrained=$CHECKPOINT_PATH > log.txt 2>&1 &
+
+python evaluate.py \
+    --config_path=$CONFIG_FILE_PATH \
+    --ckpt_file=$CHECKPOINT_PATH  > log_eval.txt 2>&1 &
 cd ..
