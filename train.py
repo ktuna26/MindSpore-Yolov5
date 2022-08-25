@@ -95,13 +95,14 @@ def run_train():
     data_loader = ds.create_tuple_iterator(do_copy=False)
     first_step = True
     t_end = time.time()
+    summary_dir = '../summary/summary_dir/'
     '''DISTRIBUTED Training'''
     # If you are using multiple NPU training scenario you should add this 2 line of code. 
     # It is provides to see your all summaries in one directory. You can switch directories easily while using mindInsight visualizer.
     # from mindspore.communication import get_rank
     # summary_dir = "../summary/summary_dir" + str(get_rank()) # It will be created in the scripts/ directory.
     '''DISTRIBUTED Training'''
-    summary_dir = '../summary/summary_dir/'
+    
     ###########################################################################################
     with ms.train.summary.SummaryRecord(summary_dir, network=network) as summary_record:
         for epoch_idx in range(config.max_epoch):
