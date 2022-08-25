@@ -15,9 +15,13 @@ modelarts_dataset_unzip_name: "coco"
 
 # ==============================================================================
 # Train options
+## "/tmp/workspace/COCO2017/train/"
 data_dir: "/data/coco" 
+## Run eval every <eval_per_step>
 eval_per_step: 1 
-per_batch_size: 32
+## Amount of batch size in train
+per_batch_size: 32 
+## version of the yolov5 model size
 yolov5_version: "yolov5s"
 pretrained_backbone: ""
 resume_yolov5: ""
@@ -51,11 +55,14 @@ resize_rate: 10
 filter_weight: False
 
 # Eval options
-pretrained: "" #
-eval_data_dir: "" #
+## "/tmp/mindspore/mind-spore-yolov5/output" 
+pretrained: "" 
+## "/tmp/workspace/COCO2017/train/train2017" 
+eval_data_dir: "" 
 log_path: "outputs/"
 ann_val_file: ""
 eval_nms_thresh: 0.6
+## Amount of how many batch will you use for evaluations.
 eval_batch_limit: 2
 ignore_threshold: 0.7
 test_ignore_threshold: 0.001
