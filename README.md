@@ -17,7 +17,9 @@
         - [Visualize Training using MindInsight](#visualize-training-using-mindinsight)
     - [Inference Process](#inference-process)
         - [Export AIR](#export-air)
+        - [AIR Model Conversion to OM](#air-model-conversion-to-om)
         - [Infer on Ascend310](#infer-on-ascend310)
+        - [Jupyter Notebook Example Output](#jupyter-notebook-example-output)
 - [Description of Random Situation](#description-of-random-situation)
 
 # [YOLOv5 Description](#contents)
@@ -357,12 +359,17 @@ python export.py --ckpt_file [CKPT_PATH] --file_name [FILE_NAME] --file_format [
 - `export.py` automatically added '_yolov5s' end of the `file_name`
 
 ### [AIR Model Conversion to OM](#contents)
+
 ```shell
 atc --model=yolov5s.air\
     --framework=1 \
     --output=yolov5s\
     --soc_version=Ascend910 # or Ascend310
 ```
+- For inference on Ascend310, `soc_version` should be change to `Ascend310`
+
+### [Infer on Ascend310](#contents)
+- For inference process, you can open the [jupyter notebook](https://gitee.com/ktuna/mind-spore-yolov5/blob/master/ascend310_infer/pt_yolov5_without_dvpp.ipynb) for a quick demo. Notebook is located in `ascend310_infer/` folder.
 
 ### [Jupyter Notebook Example Output](#contents)
 
