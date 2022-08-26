@@ -17,13 +17,8 @@ python export.py --ckpt_file [CKPT_PATH] --file_name [FILE_NAME] --file_format A
 ```bash
 atc --framework=1 \
     --model="weights/yolov5.air" \
-    --input_shape="actual_input_1:1,12,320,320"  \
     --output="weights/yolov5" \
-    --enable_small_channel=1 \
-    --log=error \
-    --soc_version=Ascend310 \
-    --op_select_implmode=high_precision \
-    --output_type=FP32
+    --soc_version=Ascend310
 ```
 
 ## Resources
