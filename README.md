@@ -381,4 +381,8 @@ In dataset.py, we set the seed inside “create_dataset" function. We also use r
 
 <br />
 
-![Ascend](https://r.huaweistatic.com/s/ascendstatic/lst/header/header-logo.png)
+
+<p float="left">
+  <img src="https://r.huaweistatic.com/s/ascendstatic/lst/header/header-logo.png" width="100" />
+  <img src="https://e-file.huawei.com/-/media/hic/products/mindspore/mindspore-logo-v4.png" width="100" /> 
+</p>
