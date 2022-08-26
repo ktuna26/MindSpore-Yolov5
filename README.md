@@ -285,12 +285,24 @@ python train.py \
 
 ### Evaluation
 
-Checkpoint 
-Before running the command below, please check the checkpoint path used for evaluation. The file **yolov5.ckpt** used in the  follow script is the last saved checkpoint file, but we renamed it to "yolov5.ckpt".
+Before running the command below, please check the checkpoint path used for evaluation.
 
+```bash
+# run evaluation on Ascend by python command
+
+python evaluate.py \
+    --config_path [CONFIG_FILE_PATH] \
+    --ckpt_file [CHECKPOINT_PATH] > log_eval.txt 2>&1 &
+```
+
+```bash
+# run evaluation by shell script, please change `device_target` in config file to run on Ascend
+bash run_evaluate.sh [CONFIG_FILE_PATH] [CHECKPOINT_PATH]
+```
+
+The above python command will run in the background. You can view the results through the file "eval.json" located in `output/eval.json`. The mAP of the test dataset will be as follows:
 
 ```text
-# log.txt
 =============coco eval reulst=========
 Average Precision (AP) @[ IoU=0.50:0.95 | area= all | maxDets=100 ] = 0.369
 Average Precision (AP) @[ IoU=0.50 | area= all | maxDets=100 ] = 0.573
@@ -328,45 +340,6 @@ python export.py --ckpt_file [CKPT_PATH] --file_name [FILE_NAME] --file_format [
 The ckpt_file parameter is required,
 `file_format` should be in ["AIR", "MINDIR"]
 
-
-### result
-
-Inference result is saved in current path, you can find result like this in acc.log file.
-
-```text
-Average Precision (AP) @[ IoU=0.50:0.95 | area= all | maxDets=100 ] = 0.369
-Average Precision (AP) @[ IoU=0.50 | area= all | maxDets=100 ] = 0.573
-Average Precision (AP) @[ IoU=0.75 | area= all | maxDets=100 ] = 0.395
-Average Precision (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.218
-Average Precision (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.418
-Average Precision (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.482
-Average Recall (AR) @[ IoU=0.50:0.95 | area= all | maxDets= 1 ] = 0.298
-Average Recall (AR) @[ IoU=0.50:0.95 | area= all | maxDets= 10 ] = 0.501
-Average Recall (AR) @[ IoU=0.50:0.95 | area= all | maxDets=100 ] = 0.557
-Average Recall (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.395
-Average Recall (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.619
-Average Recall (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.677
-```
-
-### result
-
-- You can view the results through the file eval.log. The mAP of the validation dataset will be as follows:
-
-  ```text
-  =============coco eval result=========
-  Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.366
-  Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.569
-  Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.397
-  Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.213
-  Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.415
-  Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.474
-  Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.299
-  Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.501
-  Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.557
-  Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.399
-  Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.611
-  Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.677
-  ```
 
 # [Description of Random Situation](#contents)
 
