@@ -25,6 +25,7 @@ from src.util import AverageMeter, get_param_groups, cpu_affinity
 from src.lr_scheduler import get_lr
 from src.yolo_dataset import create_yolo_dataset
 from src.initializer import default_recurisive_init, load_yolov5_params
+from src.util import DetectionEngine
 
 from model_utils.config import config
 from model_utils.device_adapter import get_device_id
@@ -66,6 +67,24 @@ def train_preprocess():
     config.logger = get_logger(config.output_dir, config.rank)
     config.logger.save_args(config)
 
+def train_eval_setup(data_root, ann_file):
+    dict_version = {'yolov5s': 0, 'yolov5m': 1, 'yolov5l': 2, 'yolov5x': 3}
+    network = YOLOV5(is_training = False, version = dict_version[config.yolov5_version]) # **********
+
+    ds = create_yolo_dataset(data_root, ann_file, is_training=False, batch_size=config.per_batch_size,
+                             device_num=1, rank=0, shuffle=False, config=config) # **********
+
+    # Changing Model Mode Train to False for Inference
+    network.set_train(False) # **********
+
+    # Calling detection engine to test all process
+    detection = DetectionEngine(config, config.test_ignore_threshold) # **********
+
+
+    # Setting up the input shape of the model
+    input_shape = ms.Tensor(tuple(config.test_img_shape), ms.float32) # **********
+    
+    return network, detection, ds, input_shape
 
 @moxing_wrapper(pre_process=modelarts_pre_process, post_process=modelarts_post_process, pre_args=[config])
 def run_train():
@@ -83,6 +102,18 @@ def run_train():
                              batch_size=config.per_batch_size, device_num=config.group_size,
                              rank=config.rank, config=config)
     config.logger.info('Finish loading dataset')
+
+    #################################################################################################
+    ########################################## EVAL PARAMS ##########################################
+    #################################################################################################
+    # Calling YOLOv5 Model to update weights with selected ckpt file
+    
+    if config.eval_per_step > 0:
+        network_eval, detection_eval, ds_eval, input_shape_eval = train_eval_setup(config.data_root, config.ann_file)
+        
+
+    #################################################################################################
+    #################################################################################################
 
     steps_per_epoch = ds.get_dataset_size()
     lr = get_lr(config, steps_per_epoch)
@@ -156,7 +187,11 @@ def run_train():
                                             epoches = epoch_idx,
                                             per_batch_size = config.per_batch_size,
                                             test_img_shape = config.test_img_shape,
-                                            test_ignore_threshold =  config.test_ignore_threshold
+                                            test_ignore_threshold =  config.test_ignore_threshold,
+                                            network = network_eval, 
+                                            detection = detection_eval,
+                                            ds = ds_eval, 
+                                            input_shape = input_shape_eval
                                             )
                 except:
                     config.logger.info('\033[31mError Occured During Evaluation Process...\033[0m')
