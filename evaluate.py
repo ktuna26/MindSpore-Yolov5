@@ -73,7 +73,11 @@ def run_eval(data_root = '/tmp/workspace/COCO2017/train/val2017',
             per_batch_size = 32,
             test_img_shape = [640, 640],
             test_ignore_threshold =  0.001,
-            config_path = None
+            config_path = None,
+            network = None,
+            detection = None,
+            ds = None,
+            input_shape = None
             ):
     
     # Path to files from config file data_root file and annotations file
@@ -105,10 +109,10 @@ def run_eval(data_root = '/tmp/workspace/COCO2017/train/val2017',
         
         # treshold to be ignored
         test_ignore_threshold = config.test_ignore_threshold
-
+        
         # Limiting how many batches will be used for evauation
         batch_limitter = config.eval_batch_limit
-
+        
         # Evaluation device type from config file
         device = config.eval_device
         
@@ -125,8 +129,29 @@ def run_eval(data_root = '/tmp/workspace/COCO2017/train/val2017',
     # Network Creation
     LOG('Netwotk is Creating for Current .ckpt Evaluetion')
     dict_version = {'yolov5s': 0, 'yolov5m': 1, 'yolov5l': 2, 'yolov5x': 3}
-    # Calling YOLOv5 Model to update weights with selected ckpt file
-    network = YOLOV5(is_training = False, version = dict_version[yolov5_version])
+    
+    if ds==None:
+        # Calling YOLOv5 Model to update weights with selected ckpt file
+        network = YOLOV5(is_training = False, version = dict_version[yolov5_version]) # **********
+
+
+        LOG('Dataset Creating')
+
+        ds = create_yolo_dataset(data_root, ann_file, is_training=False, batch_size=per_batch_size,
+                                 device_num=1, rank=0, shuffle=False, config=config) # **********
+
+
+        # Changing Model Mode Train to False for Inference
+        network.set_train(False) # **********
+
+
+        # Calling detection engine to test all process
+        detection = DetectionEngine(config, config.test_ignore_threshold) # **********
+
+
+        # Setting up the input shape of the model
+        input_shape = ms.Tensor(tuple(test_img_shape), ms.float32) # **********
+
     
     # Taking ckpt file by looking its extension, otherwise it takes latest one in the folder
     if ckpt_file[-4:] == 'ckpt':
@@ -140,29 +165,14 @@ def run_eval(data_root = '/tmp/workspace/COCO2017/train/val2017',
         load_parameters(network, ckpt_file)
     else:
         raise FileNotFoundError(f"{ckpt_file} is not a filename.")
-        
-    LOG('Dataset Creating')
-
-    ds = create_yolo_dataset(data_root, ann_file, is_training=False, batch_size=per_batch_size,
-                             device_num=1, rank=0, shuffle=False, config=config)
+    
+    
     
     
     LOG(f'Shape of Test File is: {test_img_shape}')
     LOG('Total %d Images to Eval'% (ds.get_dataset_size() * per_batch_size))
-
-
-    # Changing Model Mode Train to False for Inference
-    network.set_train(False)
     
-
-    # Calling detection engine to test all process
-    detection = DetectionEngine(config, config.test_ignore_threshold)
     
-
-    # Setting up the input shape of the model
-    input_shape = ms.Tensor(tuple(test_img_shape), ms.float32)
-
-
     # INFERENCE EXECUTION PART
     LOG(f'Inference Begins...')
     batches_track = 0
@@ -195,6 +205,7 @@ def run_eval(data_root = '/tmp/workspace/COCO2017/train/val2017',
         if index % 2 == 0:
             PROCESS(f'Current Process: %{index / batch_limitter * 100:.2f} done')
     PROCESS(f'Current Process: %100 done!!!')
+    
 
     # Mean Absolute Precision Calculation with outputs. This process took longer than others
     LOG(f'mAP is Calculating... Note: This process may take a while.')
