@@ -263,6 +263,20 @@ The above shell script will run distribute training in the background. You can v
 ...
 ```
 
+### Transfer Learning
+
+```bash
+#run training example(1p) with pretrained model on Ascend by python command
+python train.py \
+    --device_target="Ascend" \
+    --data_dir=xxx/dataset \
+    --is_distributed=0 \
+    --yolov5_version='yolov5s' \
+    --lr=0.01 \
+    --max_epoch=320 \
+    --warmup_epochs=4 \
+    --pretrained_checkpoint=/path/of/ckpt/model
+```
 
 ## [Evaluation Process](#contents)
 
@@ -351,62 +365,6 @@ Average Recall (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.677
   Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.677
   ```
 
-# [Model Description](#contents)
-
-## [Performance](#contents)
-
-### Evaluation Performance
-
-YOLOv5 on 118K images(The annotation and data format must be the same as coco2017)
-
-| Parameters                 | YOLOv5s                                                           | 
-| -------------------------- | ------------------------------------------------------------------|
-| Resource                   | Ascend 910 ；CPU 2.60GHz，192cores; Memory, 755G                   |
-| uploaded Date              | 7/12/2021 (month/day/year)                                        |
-| MindSpore Version          | 1.2.0                                                             |
-| Dataset                    | 118K images                                                       |
-| Training Parameters        | epoch=300, batch_size=8, lr=0.02,momentum=0.9,warmup_epoch=20     |
-| Optimizer                  | Momentum                                                          |
-| Loss Function              | Sigmoid Cross Entropy with logits, Giou Loss                      |
-| outputs                    | boxes and label                                                   |
-| Loss                       | 111.970097                                                        |
-| Speed                      | 8p about 450 FPS                                                  |
-| Total time                 | 8p 21h28min                                                       |
-| Checkpoint for Fine tuning | 53.62M (.ckpt file)                                               |
-| Scripts                    | https://gitee.com/mindspore/models/tree/master/official/cv/yolov5 | 
-
-### Inference Performance
-
-| Parameters          | YOLOv5s                                        |
-| ------------------- | -----------------------------------------------| 
-| Resource            | Ascend 910 ；CPU 2.60GHz，192cores; Memory, 755G |
-| Uploaded Date       | 7/12/2021 (month/day/year)                     | 
-| MindSpore Version   | 1.2.0                                          | 
-| Dataset             | 20K images                                     |
-| batch_size          | 1                                              | 
-| outputs             | box position and sorces, and probability       |
-| Accuracy            | mAP >= 36.7%(shape=640)                        | 
-| Model for inference | 56.67M (.ckpt file)                            |
-
-### Transfer Learning
-
-```bash
-#run training example(1p) with pretrained model on Ascend by python command
-python train.py \
-    --device_target="Ascend" \
-    --data_dir=xxx/dataset \
-    --is_distributed=0 \
-    --yolov5_version='yolov5s' \
-    --lr=0.01 \
-    --max_epoch=320 \
-    --warmup_epochs=4 \
-    --pretrained_checkpoint=/path/of/ckpt/model
-```
-
 # [Description of Random Situation](#contents)
 
 In dataset.py, we set the seed inside “create_dataset" function. We also use random seed in train.py.
-
-# [ModelZoo Homepage](#contents)
-
- Please check the official [homepage](https://gitee.com/mindspore/models).  
