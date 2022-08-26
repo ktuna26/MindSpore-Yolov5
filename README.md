@@ -18,7 +18,7 @@
     - [Inference Process](#inference-process)
         - [Export AIR](#export-air)
         - [AIR Model Conversion to OM](#air-model-conversion-to-om)
-        - [Infer on Ascend310](#infer-on-ascend310)
+        - [Inference on Ascend310](#inference-on-ascend310)
         - [Jupyter Notebook Example Output](#jupyter-notebook-example-output)
 - [Description of Random Situation](#description-of-random-situation)
 
@@ -368,7 +368,7 @@ atc --model=yolov5s.air\
 ```
 - For inference on Ascend310, `soc_version` should be change to `Ascend310`
 
-### [Infer on Ascend310](#contents)
+### [Inference on Ascend310](#contents)
 - For inference process, you can open the [jupyter notebook](https://gitee.com/ktuna/mind-spore-yolov5/blob/master/ascend310_infer/pt_yolov5_without_dvpp.ipynb) for a quick demo. Notebook is located in `ascend310_infer/` folder.
 
 ### [Jupyter Notebook Example Output](#contents)
