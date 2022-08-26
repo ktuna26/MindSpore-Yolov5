@@ -379,10 +379,12 @@ atc --model=yolov5s.air\
 
 In dataset.py, we set the seed inside “create_dataset" function. We also use random seed in train.py.
 
-<br />
 
 
 <p float="left">
   <img src="https://r.huaweistatic.com/s/ascendstatic/lst/header/header-logo.png" width="300" />
+  <br />
+  <br />
+  <br />
   <img src="https://e-file.huawei.com/-/media/hic/products/mindspore/mindspore-logo-v4.png" width="300" /> 
 </p>
