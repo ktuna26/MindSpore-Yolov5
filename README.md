@@ -336,7 +336,6 @@ mindinsight stop --port 9191
 ```shell
 python export.py --ckpt_file [CKPT_PATH] --file_name [FILE_NAME] --file_format [FILE_FORMAT]
 ```
-
 The ckpt_file parameter is required,
 `file_format` should be in ["AIR", "MINDIR"]
 
