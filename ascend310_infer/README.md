@@ -29,9 +29,6 @@ atc --framework=1 \
 ## Resources
 [1] https://www.hiascend.com/document/detail/en/canncommercial/504/inferapplicationdev/aclpythondevg/aclpythondevg_02_0023.html
 
-## Authors
-Kubilay Tuna
-
 ## Copyright
 Huawei Technologies Co., Ltd
 
