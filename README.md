@@ -260,6 +260,8 @@ The above shell script will run distribute training in the background. You can v
 
 ### Transfer Learning
 
+You can set a pre-trained model by using `pretrained-checkpoint` flag before the training thus your model can converges easily or continue to train your model from the epoch you left off by using `resume_yolov5` flag.
+
 ```bash
 #run training example(1p) with pretrained model on Ascend by python command
 python train.py \
