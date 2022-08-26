@@ -378,3 +378,5 @@ atc --model=yolov5s.air\
 # [Description of Random Situation](#contents)
 
 In dataset.py, we set the seed inside “create_dataset" function. We also use random seed in train.py.
+<br />
+![Ascend](https://r.huaweistatic.com/s/ascendstatic/lst/header/header-logo.png)
