@@ -116,7 +116,6 @@ Note the default_config.yaml is the default parameters for yolov5s on 8p. The `b
 ├── default_config.yaml                // parameter configuration(yolov5s 8p)
 ├── train.py                           // training script
 ├── evaluate.py                        // evaluation script
-├── eval_onnx.py                       // ONNX evaluation script
 ├── export.py                          // export script
 ├── hccl_2p.json                       // hccl file for 2 NPU 
 ├── hccl_8p.json                       // hccl file for 8 NPU 
@@ -165,9 +164,16 @@ multi_label: "use multi label to nms"
 multi_label_thresh: "multi label thresh"
 
 # Eval options
+eval_data_dir: "Evaluation dataset directory."
 pretrained: "model_path, local pretrained model to load"
 log_path: "checkpoint save location"
 ann_val_file: "path to annotation"
+eval_device: "Device running on evaluation process ('CPU' or 'Ascend')"
+eval_nms_thresh: "NMS threshold value for evaluation."
+eval_batch_limit: "Amount of how many batch will you use for evaluation."
+ignore_threshold: "Value of ignore threshold."
+test_ignore_threshold: "Value of test ignore threshold."
+
 
 # Export options
 device_id: "Device id for export"
