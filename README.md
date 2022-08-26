@@ -12,11 +12,12 @@
         - [Training](#training)
         - [Distributed Training](#distributed-training)
         - [Transfer Learning](#transfer-learning)
+    - [Evaluation Process](#evaluation-process)
+        - [Evaluation](#evaluation)
+        - [Visualize Training using MindInsight](#visualize-training-using-mindinsight)
     - [Inference Process](#inference-process)
         - [Export AIR](#export-air)
         - [Infer on Ascend310](#infer-on-ascend310)
-        - [result](#result)
-        - [result](#result)
 - [Description of Random Situation](#description-of-random-situation)
 
 # [YOLOv5 Description](#contents)
@@ -187,7 +188,7 @@ result_files: 'path to 310 infer result floder'
 
 ## [Training Process](#contents)
 
-### Training
+### [Training](#contents)
 
 For Ascend device, standalone training can be started like this:
 
@@ -226,7 +227,8 @@ After training, you'll get some checkpoint files under the **outputs** folder by
 ...
 ```
 
-### Distributed Training
+### [Distributed Training](#contents)
+
 
 Distributed training example(8p & 2p) by shell script:
 
@@ -264,7 +266,7 @@ The above shell script will run distribute training in the background. You can v
 ...
 ```
 
-### Transfer Learning
+### [Transfer Learning](#contents)
 
 You can set a pre-trained model by using `pretrained-checkpoint` flag before the training thus your model can converges easily or continue to train your model from the epoch you left off by using `resume_yolov5` flag.
 
@@ -283,7 +285,7 @@ python train.py \
 
 ## [Evaluation Process](#contents)
 
-### Evaluation
+### [Evaluation](#contents)
 
 Before running the command below, please check the checkpoint path used for evaluation.
 
@@ -318,22 +320,22 @@ Average Recall (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.619
 Average Recall (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.677
 2020-12-21 17:16:40,322:INFO:testing cost time 0.35h
 ```
-#### Visualize Training using [MindInsight](https://www.mindspore.cn/mindinsight/docs/en/r1.8/index.html)
+### [Visualize Training using MindInsight](#contents)
 
-MindInsight provides MindSpore with easy-to-use debugging and tuning capabilities. During the training, data such as scalar, tensor, image, computational graph, model hyper parameter and training's execution time can be recorded in the file for viewing and analysis through the visual page of MindInsight.
+[MindInsight](https://www.mindspore.cn/mindinsight/docs/en/r1.8/index.html) provides MindSpore with easy-to-use debugging and tuning capabilities. During the training, data such as scalar, tensor, image, computational graph, model hyper parameter and training's execution time can be recorded in the file for viewing and analysis through the visual page of MindInsight.
 
 
 ![MindInsight Architecture](https://raw.githubusercontent.com/mindspore-ai/mindinsight/master/docs/arch.png)
 
 
-##### Installation
+#### Installation
 
-###### Installation by pip: 
+##### Installation by pip: 
 
 ```bash
 pip install mindinsight
 ```
-###### Starting Service:
+##### Starting Service:
 
 ```bash
 # For Ascend device, distributed training start visualizing
@@ -346,7 +348,7 @@ It visualizes the training process, model performance optimization, and accuracy
 
 ![MindInsight Service](https://mindspore-website.obs.cn-north-4.myhuaweicloud.com/website-images/master/docs/mindinsight/docs/source_en/images/mindinsight_en.png)
 
-## Inference Process
+## [Inference Process](#contents)
 
 ### [Export AIR](#contents)
 
