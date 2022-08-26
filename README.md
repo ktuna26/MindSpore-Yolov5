@@ -22,9 +22,8 @@
 
 # [YOLOv5 Description](#contents)
 
-Published in April 2020, YOLOv5 achieved state of the art performance on the COCO dataset for object detection. It is an important improvement of YoloV3, the implementation of a new architecture in the **Backbone** and the modifications in the **Neck** have improved the **mAP**(mean Average Precision) by **10%** and the number of **FPS**(Frame per Second) by **12%**.
+Published in April 2020, [YOLOv5](https://github.com/ultralytics/yolov5) achieved state of the art performance on the COCO dataset for object detection. It is an important improvement of YoloV3, the implementation of a new architecture in the **Backbone** and the modifications in the **Neck** have improved the **mAP**(mean Average Precision) by **10%** and the number of **FPS**(Frame per Second) by **12%**.
 
-[code](https://github.com/ultralytics/yolov5)
 
 # [Model Architecture](#contents)
 
