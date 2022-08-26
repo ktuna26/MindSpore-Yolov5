@@ -352,10 +352,21 @@ It visualizes the training process, model performance optimization, and accuracy
 
 ```shell
 python export.py --ckpt_file [CKPT_PATH] --file_name [FILE_NAME] --file_format [FILE_FORMAT]
-```
-The ckpt_file parameter is required,
-`file_format` should be in ["AIR", "MINDIR"]
+``` 
+- `file_format` should be in "AIR" or "MINDIR"
+- `export.py` automatically added '_yolov5s' end of the `file_name`
 
+### [AIR Model Conversion to OM](#contents)
+```shell
+atc --model=yolov5s.air\
+    --framework=1 \
+    --output=yolov5s\
+    --soc_version=Ascend910 # or Ascend310
+```
+
+### [Jupyter Notebook Example Output](#contents)
+
+![Jupyter Output](https://gitee.com/tianyu__zhou/pyacl_samples/raw/a800/acl_yolov5_pt/data/example.png)
 
 # [Description of Random Situation](#contents)
 
