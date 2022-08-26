@@ -328,7 +328,7 @@ MindInsight provides MindSpore with easy-to-use debugging and tuning capabilitie
 
 ##### Installation
 
-######Installation by pip: 
+###### Installation by pip: 
 
 ```bash
 pip install mindinsight
@@ -345,6 +345,7 @@ mindinsight stop --port 9191
 It visualizes the training process, model performance optimization, and accuracy debugging. You can also use the command line provided by MindInsight to easily search for hyperparameters and migrate models. MindInsight helps you to easily obtain satisfactory model accuracy and performance.
 
 ![MindInsight Service](https://mindspore-website.obs.cn-north-4.myhuaweicloud.com/website-images/master/docs/mindinsight/docs/source_en/images/mindinsight_en.png)
+
 ## Inference Process
 
 ### [Export AIR](#contents)
