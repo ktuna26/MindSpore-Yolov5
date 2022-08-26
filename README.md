@@ -328,14 +328,13 @@ Average Recall (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.677
 ![MindInsight Architecture](https://raw.githubusercontent.com/mindspore-ai/mindinsight/master/docs/arch.png)
 
 
-#### Installation
 
-##### Installation by pip: 
+#### Installation by pip: 
 
 ```bash
 pip install mindinsight
 ```
-##### Starting Service:
+#### Starting Service:
 
 ```bash
 # For Ascend device, distributed training start visualizing
