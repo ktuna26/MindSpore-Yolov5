@@ -19,6 +19,7 @@ import argparse
 import numpy as np
 from glob import glob
 import pandas as pd
+from tabulate import tabulate
 
 import mindspore as ms
 
@@ -79,57 +80,68 @@ def run_eval(data_root = '/tmp/workspace/COCO2017/train/val2017',
             ds = None,
             input_shape = None
             ):
-    
+
     # Path to files from config file data_root file and annotations file
     if config_path:
         LOG(f'=================CONFIG MODE ON=================')
-        
+
+        # data file from config file
         data_root = config.eval_data_dir
-        LOG(f'Data Obtained from {data_root}')
-        
-        
-        ann_file = config.ann_file
-        LOG(f'Annotations File Obtained from {ann_file}')
-        
+        LOG(f'[CONFIG FILE] Data Obtained from {data_root}')
+
+        # annotations file from config file
+        ann_file = config.eval_ann_dir
+        LOG(f'[CONFIG FILE] Annotations File Obtained from {ann_file}')
+
         # Path to your pretrained confil folder
         ckpt_file = config.pretrained
-        LOG(f'Checkpoints Folder Obtained from {ckpt_file}')
-        
-        # Your device from config file
-        # device = config.device_target
-        
+        LOG(f'[CONFIG FILE] Checkpoints Folder Obtained from {ckpt_file}')
+
         # version of yolov5 like yolov5s
-        yolov5_version = config.yolov5_version
-        
+        yolov5_version = config.eval_yolov5_version
+        LOG(f'[CONFIG FILE] Yolov5 Version Obtained from {yolov5_version}')
+
         # length of per batch size
-        per_batch_size = config.per_batch_size
-        
+        per_batch_size = config.eval_per_batch_size
+        LOG(f'[CONFIG FILE] Testable Batch Size Determined as {per_batch_size}')
+
         # shape of test image
-        test_img_shape =config.test_img_shape
-        
+        test_img_shape =config.eval_test_img_shape
+        LOG(f'[CONFIG FILE] Shape of test image determined as {test_img_shape}')
+
         # treshold to be ignored
         test_ignore_threshold = config.test_ignore_threshold
-        
+        LOG(f'[CONFIG FILE] test_ignore_threshold =  {test_img_shape}')
+
         # Limiting how many batches will be used for evauation
         batch_limitter = config.eval_batch_limit
-        
+        LOG(f'[CONFIG FILE] Limitted Batch Size {batch_limitter}')
+
         # Evaluation device type from config file
         device = config.eval_device
-        
-    
+        LOG(f'[CONFIG FILE] Device determined as {test_img_shape}')
+
+
+    # Parameters information table
+    info_table = {'data_root':data_root, 'ann_file':ann_file, 'ckpt_file or folder':ckpt_file,
+                  'yolov5_version':yolov5_version, 'per_batch_size':per_batch_size, 'test_img_shape':test_img_shape,
+                  'test_ignore_threshold':test_ignore_threshold, 'batch_limitter':batch_limitter, 'device': device}
+    df_info_table = pd.DataFrame(info_table).T
+    print(tabulate(df_info_table, headers = 'keys', tablefmt = 'psql'))
+
 
     # Selecting Huawei Ascend Device to run all evaluation process
     LOG(f'Device is \033[33m{str(device)}\033[0m')
 
     ms.set_context(mode = ms.GRAPH_MODE, device_target = device)
-        
+
     SUCCESS(f'Parmer Setup Sucess')
     start_time = time.time()
-    
+
     # Network Creation
     LOG('Netwotk is Creating for Current .ckpt Evaluetion')
     dict_version = {'yolov5s': 0, 'yolov5m': 1, 'yolov5l': 2, 'yolov5x': 3}
-    
+
     if ds==None:
         # Calling YOLOv5 Model to update weights with selected ckpt file
         network = YOLOV5(is_training = False, version = dict_version[yolov5_version]) # **********
@@ -152,7 +164,7 @@ def run_eval(data_root = '/tmp/workspace/COCO2017/train/val2017',
         # Setting up the input shape of the model
         input_shape = ms.Tensor(tuple(test_img_shape), ms.float32) # **********
 
-    
+
     # Taking ckpt file by looking its extension, otherwise it takes latest one in the folder
     if ckpt_file[-4:] == 'ckpt':
         LOG(f'Your .ckpt File is {ckpt_file}')
@@ -165,18 +177,18 @@ def run_eval(data_root = '/tmp/workspace/COCO2017/train/val2017',
         load_parameters(network, ckpt_file)
     else:
         raise FileNotFoundError(f"{ckpt_file} is not a filename.")
-    
-    
-    
-    
+
+
+
+
     LOG(f'Shape of Test File is: {test_img_shape}')
     LOG('Total %d Images to Eval'% (ds.get_dataset_size() * per_batch_size))
-    
-    
+
+
     # INFERENCE EXECUTION PART
     LOG(f'Inference Begins...')
     batches_track = 0
-    
+
     for index, data in enumerate(ds.create_dict_iterator(output_numpy=True, num_epochs=1)):
 
         image = data["image"]
@@ -193,6 +205,7 @@ def run_eval(data_root = '/tmp/workspace/COCO2017/train/val2017',
         output_me = output_me.asnumpy()
         output_small = output_small.asnumpy()
 
+
         # Detection part
         detection.detect([output_small, output_me, output_big], per_batch_size, image_shape_, image_id_)
         batches_track += 1
@@ -205,14 +218,14 @@ def run_eval(data_root = '/tmp/workspace/COCO2017/train/val2017',
         if index % 2 == 0:
             PROCESS(f'Current Process: %{index / batch_limitter * 100:.2f} done')
     PROCESS(f'Current Process: %100 done!!!')
-    
+
 
     # Mean Absolute Precision Calculation with outputs. This process took longer than others
     LOG(f'mAP is Calculating... Note: This process may take a while.')
     detection.do_nms_for_results()
     result_file_path = detection.write_result()
 
-    # Getting evaluated result 
+    # Getting evaluated result
     LOG('File Path of the Result: %s'% (result_file_path))
     eval_result = detection.get_eval_result()
 
@@ -220,7 +233,7 @@ def run_eval(data_root = '/tmp/workspace/COCO2017/train/val2017',
     with  open("output.txt", "w") as file:
         file.write(eval_result)
         file.close()
-        
+
     # Save output as JSON
     LOG('Saving As Json')
     if os.path.exists("./output/evals.json"):
@@ -232,7 +245,7 @@ def run_eval(data_root = '/tmp/workspace/COCO2017/train/val2017',
     else:
         new = pd.read_csv('./output.txt', names = [f'epoches_{epoches}'], sep=' = ',  header=None, index_col=0).T
         new.to_json(r'./output/evals.json', orient='index')
-    
+
     # Remove thrash txt file
     if os.path.exists("./output.txt"):
           os.remove("./output.txt")
@@ -242,21 +255,21 @@ def run_eval(data_root = '/tmp/workspace/COCO2017/train/val2017',
     eval_log_string = '\n================== Eval Result of the Process ==================\n' + eval_result
     LOG(eval_log_string)
     LOG('testing cost time %.2f h'% (cost_time / 3600.))
-    
+
     return new.to_dict()
 
-# Argument parsing 
+# Argument parsing
 def parse_opt():
     parser = argparse.ArgumentParser()
     parser.add_argument('--config_path', default = None, help = 'Use config file for variables')
-    #parser.add_argument('--ckpt_file', default = '/tmp/mindspore/model', help = 'PAth to ckpt folder Note: Model selects latest code by automaticly. If you give ckpt file, it will take that')
     opt = parser.parse_args()
     print(opt)
     return opt
 
 def main(opt):
     run_eval(**vars(opt))
-    
-if __name__ == "__main__":    
+
+if __name__ == "__main__":
     opt = parse_opt()
     main(opt)
+
