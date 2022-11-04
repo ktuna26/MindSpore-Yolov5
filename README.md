@@ -296,10 +296,10 @@ Before running the command below, please check the checkpoint path used for eval
 # Eval options
 pretrained: "./output/" ### You can give ckpt files path directly (./output/yolov5_155_3664.ckptexi)
 eval_data_dir: "/workspace/COCO2017/train/train2017" ### Evaluation datasets (Only images)
-eval_ann_dir = "/workspace/COCO2017/train/annotations/instances_train2017.json" ### Evaluation Annotaions (Json file)
-eval_yolov5_version = "yolov5s" ### ckpt trained data type
-eval_per_batch_size = 32 ### Batch size of pretrained network
-eval_test_img_shape = [640, 640] ### Models input shape
+eval_ann_dir: "/workspace/COCO2017/train/annotations/instances_train2017.json" ### Evaluation Annotaions (Json file)
+eval_yolov5_version: "yolov5s" ### ckpt trained data type
+eval_per_batch_size: 32 ### Batch size of pretrained network
+eval_test_img_shape: [640, 640] ### Models input shape
 log_path: "outputs/" ### log_path
 # Device to run evaluations
 eval_device: "CPU" ### CPU or Ascend
