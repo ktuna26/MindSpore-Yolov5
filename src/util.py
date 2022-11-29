@@ -168,14 +168,18 @@ def cpu_affinity(rank_id, device_num):
 class DetectionEngine:
     """Detection engine."""
 
-    def __init__(self, args_detection, threshold):
+    def __init__(self, args_detection, threshold, only_eval = False):
         self.ignore_threshold = threshold
         self.labels = args_detection.labels
         self.num_classes = len(self.labels)
         self.results = {}
         self.file_path = ''
         self.save_prefix = args_detection.output_dir
-        self.ann_file = args_detection.ann_file
+        if only_eval:
+            self.ann_file = args_detection.eval_ann_dir
+        else:
+            self.ann_file = args_detection.ann_file
+
         self._coco = COCO(self.ann_file)
         self._img_ids = list(sorted(self._coco.imgs.keys()))
         self.det_boxes = []

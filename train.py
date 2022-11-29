@@ -109,7 +109,7 @@ def run_train():
     # Calling YOLOv5 Model to update weights with selected ckpt file
     
     if config.eval_per_step > 0:
-        network_eval, detection_eval, ds_eval, input_shape_eval = train_eval_setup(config.data_root, config.ann_file)
+        network_eval, detection_eval, ds_eval, input_shape_eval = train_eval_setup(config.eval_data_dir, config.eval_ann_dir)
         
 
     #################################################################################################
@@ -178,15 +178,15 @@ def run_train():
             if epoch_idx%config.eval_per_step == 0:
                 # Precision and Recall Scores Which Returned From Evaluation 
                 try:
-                    eval_scores = run_eval(data_root = config.data_root,
-                                            ann_file = config.annFile,
-                                            yolov5_version = config.yolov5_version,
+                    eval_scores = run_eval(data_root = config.eval_data_dir,
+                                            ann_file = config.eval_ann_dir,
+                                            yolov5_version = config.eval_yolov5_version,
                                             device = 'CPU',
                                             ckpt_file = config.output_dir,
                                             batch_limitter = config.eval_batch_limit,
                                             epoches = epoch_idx,
-                                            per_batch_size = config.per_batch_size,
-                                            test_img_shape = config.test_img_shape,
+                                            per_batch_size = config.eval_per_batch_size,
+                                            test_img_shape = config.eval_test_img_shape,
                                             test_ignore_threshold =  config.test_ignore_threshold,
                                             network = network_eval, 
                                             detection = detection_eval,

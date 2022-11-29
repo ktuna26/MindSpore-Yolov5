@@ -127,8 +127,6 @@ def run_eval(data_root = '/tmp/workspace/COCO2017/train/val2017',
                   'yolov5_version':yolov5_version, 'per_batch_size':per_batch_size, 'test_img_shape':test_img_shape,
                   'test_ignore_threshold':test_ignore_threshold, 'batch_limitter':batch_limitter, 'device': device}
     df_info_table = pd.DataFrame(info_table).T
-    print(tabulate(df_info_table, headers = 'keys', tablefmt = 'psql'))
-
 
     # Selecting Huawei Ascend Device to run all evaluation process
     LOG(f'Device is \033[33m{str(device)}\033[0m')
@@ -144,74 +142,79 @@ def run_eval(data_root = '/tmp/workspace/COCO2017/train/val2017',
 
     if ds==None:
         # Calling YOLOv5 Model to update weights with selected ckpt file
-        network = YOLOV5(is_training = False, version = dict_version[yolov5_version]) # **********
+        network = YOLOV5(is_training = False, version = dict_version[yolov5_version])
 
 
         LOG('Dataset Creating')
 
         ds = create_yolo_dataset(data_root, ann_file, is_training=False, batch_size=per_batch_size,
-                                 device_num=1, rank=0, shuffle=False, config=config) # **********
+                                 device_num=1, rank=0, shuffle=False, config=config) 
 
 
         # Changing Model Mode Train to False for Inference
-        network.set_train(False) # **********
+        network.set_train(False) 
 
 
         # Calling detection engine to test all process
-        detection = DetectionEngine(config, config.test_ignore_threshold) # **********
+        detection = DetectionEngine(config, config.test_ignore_threshold, only_eval = True)
 
 
         # Setting up the input shape of the model
-        input_shape = ms.Tensor(tuple(test_img_shape), ms.float32) # **********
+        input_shape = ms.Tensor(tuple(test_img_shape), ms.float32) 
 
 
     # Taking ckpt file by looking its extension, otherwise it takes latest one in the folder
     if ckpt_file[-4:] == 'ckpt':
         LOG(f'Your .ckpt File is {ckpt_file}')
         pass
+    elif ckpt_file[-4:] == 'ndir':
+        LOG(f'Your .mindir File is {ckpt_file}')
     else:
         ckpt_file = sorted(glob(f'{ckpt_file}/*.ckpt'), key=os.path.getmtime)[-1]
         LOG(f'Your .ckpt Folder is {ckpt_file}')
 
     if os.path.isfile(ckpt_file):
         load_parameters(network, ckpt_file)
+
     else:
         raise FileNotFoundError(f"{ckpt_file} is not a filename.")
 
-
-
-
     LOG(f'Shape of Test File is: {test_img_shape}')
     LOG('Total %d Images to Eval'% (ds.get_dataset_size() * per_batch_size))
-
-
+    
     # INFERENCE EXECUTION PART
     LOG(f'Inference Begins...')
+    
     batches_track = 0
-
+    if batch_limitter == 0:
+        batch_limitter = int(config.dataset_size / config.eval_per_batch_size)
+        # print(f'\n==========\n{batch_limitter}\n==========\n')
+        
     for index, data in enumerate(ds.create_dict_iterator(output_numpy=True, num_epochs=1)):
 
         image = data["image"]
+        image_shape_ = data["image_shape"]
+        image_id_ = data["img_id"]
+        
+        
         # Shaping data to corresponding input format
         image = np.concatenate((image[..., ::2, ::2], image[..., 1::2, ::2],
                                 image[..., ::2, 1::2], image[..., 1::2, 1::2]), axis=1)
+        
 
         # Changing image array into Tensor(Like pytorch Tensor and numpys np.array) and process all
         image = ms.Tensor(image)
-        image_shape_ = data["image_shape"]
-        image_id_ = data["img_id"]
         output_big, output_me, output_small = network(image, input_shape)
         output_big = output_big.asnumpy()
         output_me = output_me.asnumpy()
         output_small = output_small.asnumpy()
-
 
         # Detection part
         detection.detect([output_small, output_me, output_big], per_batch_size, image_shape_, image_id_)
         batches_track += 1
 
         # Limiting batches to create test result with limited image to process faster
-        if batches_track == batch_limitter:
+        if batches_track == batch_limitter and batch_limitter != 0:
             break
 
         # Printing process every 10 step with adhjusted percentage

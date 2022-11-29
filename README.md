@@ -20,6 +20,9 @@
         - [AIR Model Conversion to OM](#air-model-conversion-to-om)
         - [Inference on Ascend310](#inference-on-ascend310)
         - [Jupyter Notebook Example Output](#jupyter-notebook-example-output)
+- [Ascend Performance](#ascend-performance)
+    - [Training Performance](#training-performance)
+    - [Inference Performance](#inference-performance)
 - [Description of Random Situation](#description-of-random-situation)
 
 # [YOLOv5 Description](#contents)
@@ -69,13 +72,12 @@ bash run_distribute_train.sh [DATASET_PATH] [RANK_TABLE_FILE]
 # run evaluation on Ascend by python command
 
 python evaluate.py \
-    --config_path [CONFIG_FILE_PATH] \
-    --ckpt_file [CHECKPOINT_PATH] > log_eval.txt 2>&1 &
+    --config_path [CONFIG_FILE_PATH] 
 ```
 
 ```bash
 # run evaluation by shell script, please change `device_target` in config file to run on Ascend
-bash run_evaluate.sh [CONFIG_FILE_PATH] [CHECKPOINT_PATH]
+bash eval_with_time.sh
 ```
 
 Note the default_config.yaml is the default parameters for yolov5s on 8p. The `batchsize` and `lr` are different on Ascend, see the settings in `scripts/run_distribute_train.sh`
@@ -290,29 +292,6 @@ python train.py \
 
 Before running the command below, please check the checkpoint path used for evaluation.
 
-### Evaluation Config Information
-
-```yaml
-# Eval options
-pretrained: "./output/" ### You can give ckpt files path directly (./output/yolov5_155_3664.ckptexi)
-eval_data_dir: "/workspace/COCO2017/train/train2017" ### Evaluation datasets (Only images)
-eval_ann_dir: "/workspace/COCO2017/train/annotations/instances_train2017.json" ### Evaluation Annotaions (Json file)
-eval_yolov5_version: "yolov5s" ### ckpt trained data type
-eval_per_batch_size: 32 ### Batch size of pretrained network
-eval_test_img_shape: [640, 640] ### Models input shape
-log_path: "outputs/" ### log_path
-# Device to run evaluations
-eval_device: "CPU" ### CPU or Ascend
-eval_nms_thresh: 0.6 ### nms threshold
-## Amount of how many batch will you use for evaluations.
-eval_batch_limit: 2 ### How many batch will be include to evaluation
-ignore_threshold: 0.7 ### Confidence threshold
-test_ignore_threshold: 0.001 ### ignoreable threshold for test
-multi_label: True ### multi label for eval
-multi_label_thresh: 0.1 ### threshold
-```
-
-
 ```bash
 # run evaluation on Ascend by python command
 
@@ -397,6 +376,39 @@ atc --model=yolov5s.air\
 ### [Jupyter Notebook Example Output](#contents)
 
 ![Jupyter Output](https://gitee.com/tianyu__zhou/pyacl_samples/raw/a800/acl_yolov5_pt/data/example.png)
+
+
+# [Ascend Performance](#contents)
+## [Training Performance](#contents)
+||8 NPU Ascend 910| 1 NPU Ascend 910|
+|-|-|-|
+|Version|YOLOv5s|YOLOv5s|
+|Resource|Ascend910; CPU 2.10GHz, 80 Cores; Memory, 100G|Ascend910; CPU 2.10GHz, 80 Cores; Memory, 100G|
+|Upload Date|14.11.2022|7.11.2022|
+|Mindspore Version|1.8.0|1.8.0|
+|Dataset| 118287 Images|118287 Images|
+|Training Parameters|epoch=320, lr=0.01, batch_size=32, momentum=0.9, warmup_epoches=4|epoch=320, lr=0.01, batch_size=32, momentum=0.9, warmup_epoches=4|
+|Optimizer|Momentum|Momentum|
+|Loss Function |Sigmoid Cross Entropy with logits, Giou Loss|Sigmoid Cross Entropy with logits, Giou Loss|
+|Outputs |Boxes and Label|Boxes and Label|
+|Speed | 8 NPU about 292.42 FPS|1 NPU about 79.1 FPS|
+|Loss | 86.88|83.297167|
+|Total Time| 1d,11h:38m:26s / 2022-11-11 14:07:23 to 2022-11-13 01:45:49|5d,11h:49m:28s / 2022-11-01 14:00:34 to 2022-11-07 01:50:02|
+|Checkpoint for Fine tuning|57M (.ckpt file)|61M (.ckpt file)|
+|Scripts|https://gitee.com/ktuna/mind-spore-yolov5/blob/master/train.py |https://gitee.com/ktuna/mind-spore-yolov5/blob/master/train.py |
+
+## [Inference Performance](#contents)
+||1 NPU Ascend 910|1 NPU 310 INFERENCE|
+|-|-|-|
+Resource |Ascend910; CPU 2.10GHz, 80 Cores; Memory, 100G | Ascend310; CPU 2.10GHz, 48 Cores; Memory, 64G |
+Upload Date| 14.11.2022 |14.11.2022 |
+Mindspore Version|1.8.0 |1.8.0 |
+Dataset  |4992 Images |4992 Images |
+Batch Size  | 1 |1|
+Outputs  | Box Position, Sorces, and Probability |Box Position, Sorces, and Probability |
+Accuracy | mAP >= 36.7%(shape=640) |mAP >= 36.7%(shape=640)(CPU) / mAP >= 35.3%(shape=640)(Ascend ".om") |
+Total Time | 28m:14s (CPU) / 19m:10s (Ascend) | 37m:34s (CPU) / 10m:26s (Ascend ".om")|
+Model for Inference  | 57M (.ckpt file) | 57M (.ckpt file) / 16M (.om file)|
 
 # [Description of Random Situation](#contents)
 

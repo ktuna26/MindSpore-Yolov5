@@ -15,12 +15,12 @@ modelarts_dataset_unzip_name: "coco"
 
 # ==============================================================================
 # Train options
-## "/tmp/workspace/COCO2017/train/"
+## Data Directory path Ex: ../COCO2017/train/
 data_dir: "/workspace/COCO2017/train/" 
 ## Run eval every <eval_per_step>
-eval_per_step: 950
+eval_per_step: 20
 ## Amount of batch size in train
-per_batch_size: 32 
+per_batch_size: 64 
 ## version of the yolov5 model size
 yolov5_version: "yolov5s"
 pretrained_backbone: ""
@@ -29,9 +29,11 @@ pretrained_checkpoint: ""
 output_dir: "./output"
 train_img_dir: "train2017"
 train_json_file: "annotations/instances_train2017.json"
+## Annotations file for training Ex: ../COCO2017/train/annotations/instances_train2017.json
+ann_file: "" #
 
 lr_scheduler: "cosine_annealing"
-lr: 0.01
+lr: 0.02
 lr_epochs: "220,250"
 lr_gamma: 0.1
 eta_min: 0.0
@@ -45,7 +47,7 @@ label_smooth: 0
 label_smooth_factor: 0.1
 log_interval: 100
 ckpt_path: "outputs/"
-is_distributed: 0
+is_distributed: 1
 bind_cpu: True
 device_num: 8
 rank: 0
@@ -54,37 +56,45 @@ need_profiler: 0
 resize_rate: 10
 filter_weight: False
 
-
 # Eval options
-pretrained: "./output/yolov5_155_3664.ckpt"
-eval_data_dir: "/workspace/COCO2017/train/train2017"
-eval_ann_dir : "/workspace/COCO2017/train/annotations/instances_train2017.json"
+## Path to pretrained .ckpt file or folder(It gets last file from folder by date) Ex: ./output/
+pretrained: ""
+## Val dataset path for evaluation Ex: ../COCO2017/train/val2017/
+eval_data_dir: ""
+## JSON file for Val Dataset Ex: ../COCO2017/train/annotations/instances_val2017.jso
+eval_ann_dir : ""
+## Yolo Version
 eval_yolov5_version : "yolov5s"
+## Per image amount for per evaluation step
 eval_per_batch_size : 32
+## Evaluation image input
 eval_test_img_shape : [640, 640]
+## Output for logs path
 log_path: "outputs/"
-ann_val_file: ""
-# Device to run evaluations
+## Device to run evaluations
 eval_device: "CPU"
-eval_nms_thresh: 0.6
-## Amount of how many batch will you use for evaluations.
-eval_batch_limit: 2
-ignore_threshold: 0.7
+## nms parameter for bboxes
+eval_nms_thresh: 0.45
+## Amount of how many batch will you use for evaluations. 0 for no limit
+eval_batch_limit: 0
+## Threshold for confidence of detections
+ignore_threshold: 0.6
+## Threshold for confidence of detections before nms
 test_ignore_threshold: 0.001
 multi_label: True
-multi_label_thresh: 0.1
+multi_label_thresh: 0.6
 
 
 
 # Export options
 device_id: 0
-batch_size: 1
+batch_size: 128
 testing_shape: [640, 640]
 ckpt_file: ""
 file_name: "yolov5"
 file_format: "MINDIR"
 dataset_path: ""
-ann_file: "/workspace/COCO2017/train/annotations/instances_train2017.json" #
+
 
 
 # Other default config
