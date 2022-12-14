@@ -1,4 +1,6 @@
-# Copyright 2021-2022 Huawei Technologies Co., Ltd
+# Copyright 2021 Huawei Technologies Co., Ltd
+# CREATED:  2022-11-25 10:12:13
+# MODIFIED: 2022-12-05 12:48:45
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,7 +13,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# ============================================================================
+# =========================================================================
 """Preprocess dataset."""
 import random
 import threading
@@ -20,7 +22,7 @@ import copy
 import numpy as np
 from PIL import Image
 import cv2
-import mindspore.dataset.vision.c_transforms as vision
+import mindspore.dataset.vision as vision
 
 
 def _rand(a=0., b=1.):

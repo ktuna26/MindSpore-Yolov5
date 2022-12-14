@@ -1,5 +1,7 @@
 #!/bin/bash
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
+# CREATED:  2022-11-25 10:12:13
+# MODIFIED: 2022-12-05 12:48:45
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
+"""easy start bash script for distributed trainig"""
 
 if [ $# != 2 ]
 then
@@ -69,10 +72,10 @@ do
     cd ./train_parallel$i || exit
     echo "start training for rank $RANK_ID, device $DEVICE_ID"
     env > env.log
-    taskset -c $cmdopt python train.py \
+    taskset -c $cmdopt python3 train.py \
         --data_dir=$DATASET_PATH \
         --is_distributed=1 \
         --lr=0.02 \
-        --per_batch_size=16 > log.txt 2>&1 &
+        --train_per_batch_size=16 > log.txt 2>&1 &
     cd ..
 done
