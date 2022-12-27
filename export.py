@@ -1,4 +1,6 @@
 # Copyright 2022 Huawei Technologies Co., Ltd
+# CREATED:  2022-11-25 10:12:13
+# MODIFIED: 2022-12-05 12:48:45
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,10 +14,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
+"""exporting yolov5 model"""
 import mindspore as ms
 
 from src.yolo import YOLOV5s_Infer
-
 from model_utils.config import config
 from model_utils.moxing_adapter import moxing_wrapper, modelarts_export_preprocess
 
@@ -29,13 +31,13 @@ def run_export():
     dict_version = {'yolov5s': 0, 'yolov5m': 1, 'yolov5l': 2, 'yolov5x': 3}
     config.file_name = config.file_name + '_' + config.yolov5_version
 
-    network = YOLOV5s_Infer(config.testing_shape[0], version=dict_version[config.yolov5_version])
+    network = YOLOV5s_Infer(config.test_img_shape[0], version=dict_version[config.yolov5_version])
     network.set_train(False)
 
     param_dict = ms.load_checkpoint(config.ckpt_file)
     ms.load_param_into_net(network, param_dict)
 
-    ts = config.testing_shape[0] // 2
+    ts = config.test_img_shape[0] // 2
     input_data = ms.numpy.zeros([config.batch_size, 12, ts, ts], ms.float32)
 
     ms.export(network, input_data, file_name=config.file_name, file_format=config.file_format)

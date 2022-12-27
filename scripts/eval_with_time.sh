@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 # CREATED:  2022-11-25 10:12:13
 # MODIFIED: 2022-12-05 12:48:45
 #
@@ -13,25 +13,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# =========================================================================
-"""Local adapter"""
-import os
+# ============================================================================
+"""calculation of total evaluation time"""
 
-
-def get_device_id():
-    device_id = os.getenv('DEVICE_ID', '0')
-    return int(device_id)
-
-
-def get_device_num():
-    device_num = os.getenv('RANK_SIZE', '1')
-    return int(device_num)
-
-
-def get_rank_id():
-    global_rank_id = os.getenv('RANK_ID', '0')
-    return int(global_rank_id)
-
-
-def get_job_id():
-    return "Local Job"
+start_time="$(date -u +%s)"
+python3 ../evaluate.py --config_path ../default_config.yaml
+end_time="$(date -u +%s)"
+elapsed="$(($end_time-$start_time))"
+echo "Total of $elapsed seconds elapsed for process"

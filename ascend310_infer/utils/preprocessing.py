@@ -1,15 +1,27 @@
+# Copyright 2022 Huawei Technologies Co., Ltd
+# CREATED:  2020-6-04 20:12:13
+# MODIFIED: 2022-08-17 12:05:45
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ============================================================================
 """
 This script provide preprocessing for inference
 Copyright 2021 Huawei Technologies Co., Ltd
-
-CREATED:  2020-6-04 20:12:13
-MODIFIED: 2022-08-17 12:05:45
 """
 # -*- coding:utf-8 -*-
 import numpy as np
 import cv2
 
-# -*- coding:utf-8 -*-
 
 def __letterbox(img, new_shape=(640, 640), color=(128, 128, 128), auto=True, scaleFill=False, scaleup=True):
     # Resize image to a 32-pixel-multiple rectangle https://github.com/ultralytics/yolov3/issues/232

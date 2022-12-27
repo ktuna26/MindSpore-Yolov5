@@ -1,5 +1,7 @@
 #!/bin/bash
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
+# CREATED:  2022-11-25 10:12:13
+# MODIFIED: 2022-12-05 12:48:45
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
+"""easy start bash script for standalone trainig"""
 
 if [ $# != 1 ]
 then
@@ -57,5 +60,5 @@ cd ./train || exit
 echo "start training for device $DEVICE_ID"
 env > env.log
 
-python train.py --data_dir=$DATASET_PATH > log.txt 2>&1 &
+python3 train.py --data_dir=$DATASET_PATH > log.txt 2>&1 &
 cd ..

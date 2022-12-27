@@ -1,4 +1,6 @@
 # Copyright 2021 Huawei Technologies Co., Ltd
+# CREATED:  2022-11-25 10:12:13
+# MODIFIED: 2022-12-05 12:48:45
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,16 +13,15 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# ============================================================================
-
+# =========================================================================
 """Moxing adapter for ModelArts"""
-
 import os
 import functools
 import mindspore as ms
 from .config import config
 
 _global_sync_count = 0
+
 
 def get_device_id():
     device_id = os.getenv('DEVICE_ID', '0')
@@ -41,6 +42,7 @@ def get_job_id():
     job_id = os.getenv('JOB_ID')
     job_id = job_id if job_id != "" else "default"
     return job_id
+
 
 def sync_data(from_path, to_path):
     """
@@ -71,6 +73,7 @@ def sync_data(from_path, to_path):
         time.sleep(1)
 
     print("Finish sync data from {} to {}.".format(from_path, to_path))
+
 
 def modelarts_pre_process(args):
     '''modelarts pre process function.'''
@@ -124,13 +127,16 @@ def modelarts_pre_process(args):
         print("Device: {}, Finish sync unzip data from {} to {}.".format(get_device_id(), zip_file_1, save_dir_1))
 
     args.output_dir = os.path.join(args.output_path, args.output_dir)
-    args.ckpt_path = os.path.join(args.output_path, args.ckpt_path)
+    # args.ckpt_path = os.path.join(args.output_path, args.ckpt_path)
+
 
 def modelarts_post_process():
     sync_data(from_path='/cache/output', to_path='obs://hit-cyf/yolov5_npu/outputs/')
 
+
 def modelarts_export_preprocess(args):
     args.file_name = os.path.join(args.output_path, args.file_name)
+
 
 def moxing_wrapper(pre_process=None, post_process=None, **kwargs):
     """

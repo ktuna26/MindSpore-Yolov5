@@ -20,7 +20,11 @@
         - [AIR Model Conversion to OM](#air-model-conversion-to-om)
         - [Inference on Ascend310](#inference-on-ascend310)
         - [Jupyter Notebook Example Output](#jupyter-notebook-example-output)
+- [Ascend Performance](#ascend-performance)
+    - [Training Performance](#training-performance)
+    - [Inference Performance](#inference-performance)
 - [Description of Random Situation](#description-of-random-situation)
+
 
 # [YOLOv5 Description](#contents)
 
@@ -31,19 +35,26 @@ Published in April 2020, [YOLOv5](https://github.com/ultralytics/yolov5) achieve
 
 The YOLOv5 network is mainly composed of CSP and Focus as a backbone, spatial pyramid pooling(SPP) additional module, PANet path-aggregation neck and YOLOv3 head. [CSP](https://arxiv.org/abs/1911.11929) is a novel backbone that can enhance the learning capability of CNN. The [spatial pyramid pooling](https://arxiv.org/abs/1406.4729) block is added over CSP to increase the receptive field and separate out the most significant context features. Instead of Feature pyramid networks (FPN) for object detection used in YOLOv3, the PANet is used as the method for parameter aggregation for different detector levels. To be more specifical, CSPDarknet53 contains 5 CSP modules which use the convolution **C** with kernel size k=3x3, stride s = 2x2; Within the PANet and SPP, **1x1, 5x5, 9x9, 13x13 max poolings are applied.
 
+
 # [Dataset](#contents)
 
 Dataset used: [COCO2017](<https://cocodataset.org/#download>)
 
 Note that you can run the scripts with **COCO2017 **or any other datasets with the same format as MS COCO Annotation. But we do suggest user to use MS COCO dataset to experience our model.
 
+
 # [Quick Start](#contents)
 
-After installing MindSpore via the official website, you can start training and evaluation as follows:
+After installing MindSpore via [pip install](https://www.mindspore.cn/install/en) or using MindSpore docker image from [ascendhub](https://ascendhub.huawei.com/#/detail/mindspore-modelzoo), you can start training and evaluation as follows:
+
+```bash
+#run pip install command to install 3th parthy dependencies
+pip3 install -r requirements.txt
+```
 
 ```bash
 #run training example(1p) on Ascend by python command
-python train.py \
+python3 train.py \
     --device_target="Ascend" \ 
     --data_dir=xxx/dataset \
     --is_distributed=0 \
@@ -62,23 +73,21 @@ bash run_2npu_distribute_train.sh [DATASET_PATH] [RANK_TABLE_FILE]
 
 # For Ascend device, distributed training example(8p) by shell script
 bash run_distribute_train.sh [DATASET_PATH] [RANK_TABLE_FILE]
-
 ```
 
 ```bash
 # run evaluation on Ascend by python command
-
-python evaluate.py \
-    --config_path [CONFIG_FILE_PATH] \
-    --ckpt_file [CHECKPOINT_PATH] > log_eval.txt 2>&1 &
+python3 evaluate.py \
+    --config_path [CONFIG_FILE_PATH] 
 ```
 
 ```bash
 # run evaluation by shell script, please change `device_target` in config file to run on Ascend
-bash run_evaluate.sh [CONFIG_FILE_PATH] [CHECKPOINT_PATH]
+bash eval_with_time.sh
 ```
 
 Note the default_config.yaml is the default parameters for yolov5s on 8p. The `batchsize` and `lr` are different on Ascend, see the settings in `scripts/run_distribute_train.sh`
+
 
 # [Script Description](#contents)
 
@@ -128,63 +137,95 @@ Note the default_config.yaml is the default parameters for yolov5s on 8p. The `b
 ## [Script Parameters](#contents)
 
 ```text
-# Help description for each configuration
-# Train options
-data_dir: "Train dataset directory."
-per_batch_size: "Batch size for Training."
-pretrained_backbone: "The ckpt file of CspDarkNet53."
-resume_yolov5: "The ckpt file of YOLOv5, which used to fine tune."
-pretrained_checkpoint: "The ckpt file of YOLOv5CspDarkNet53."
-lr_scheduler: "Learning rate scheduler, options: exponential, cosine_annealing."
-lr: "Learning rate."
-lr_epochs: "Epoch of changing of lr changing, split with ','."
-lr_gamma: "Decrease lr by a factor of exponential lr_scheduler."
-eta_min: "Eta_min in cosine_annealing scheduler."
-T_max: "T-max in cosine_annealing scheduler."
-max_epoch: "Max epoch num to train the model."
-warmup_epochs: "Warmup epochs."
-weight_decay: "Weight decay factor."
-momentum: "Momentum."
-loss_scale: "Static loss scale."
-label_smooth: "Whether to use label smooth in CE."
-label_smooth_factor: "Smooth strength of original one-hot."
-log_interval: "Logging interval steps."
-ckpt_path: "Checkpoint save location."
-ckpt_interval: "Save checkpoint interval."
-is_save_on_master: "Save ckpt on master or all rank, 1 for master, 0 for all ranks."
-is_distributed: "Distribute train or not, 1 for yes, 0 for no."
-bind_cpu: "Whether bind cpu when distributed training."
+
+# Help Description for Each Configuration
+# General Options
+yolov5_version: "Version of the yolov5<model_size>"
+data_dir: "Data directory path"
+output_dir: "Training outputs path"
+
+# ModelArts Options
+enable_modelarts:
+data_url: "Data url for modelarts (remote server)"
+train_url: "Train script url for modelarts (remote server)"
+checkpoint_url: "Checkpoint file url for modelarts (remote server)"
+outputs_url: "Outputs folder url for modelarts (remote server)"
+data_path: "Local data path"
+output_path: "Local output path"
+load_path: "Local loading path"
+device_target: "Local loading path"
+need_modelarts_dataset_unzip: "Define if modelarts needs unzip dataset or not"
+modelarts_dataset_unzip_name: "Define unziped dataset name"
+
+# Train Options
+train_img_dir: "Training images path"
+train_json_file: "Training annotation file path"
+resume_yolov5: "The ckpt file of YOLOv5, which used to fine tune"
+pretrained_backbone: "The ckpt file of CspDarkNet53"
+pretrained_checkpoint: "The ckpt file of YOLOv5CspDarkNet53"
+train_per_batch_size: "Batch size for training"
+eval_per_step: "Run evaluation per X steps"
+T_max: "T-max in cosine_annealing scheduler"     
+max_epoch: "Max epoch num to train the model"
+warmup_epochs: "Warmup epochs"
+lr_scheduler: "Learning rate scheduler, options: exponential, cosine_annealing"
+lr: "Learning rate"
+lr_epochs: "Epoch of changing of lr changing, split with ','"
+lr_gamma: "Decrease lr by a factor of exponential lr_scheduler"
+eta_min: "Eta_min in cosine_annealing scheduler"
+weight_decay: "Weight decay factor"
+momentum: "Momentum"
+loss_scale: "Static loss scale"
+label_smooth: "Whether to use label smooth in CE"
+label_smooth_factor: "Smooth strength of original one-hot"
+log_interval: "Logging interval steps"
+ckpt_interval: "Save checkpoint interval"
+is_save_on_master: "Save ckpt on master or all rank, 1 for master, 0 for all ranks"
+is_distributed: "Distribute train or not, 1 for yes, 0 for no"
+bind_cpu: "Whether bind cpu when distributed training"
 device_num: "Device numbers per server"
-rank: "Local rank of distributed."
-group_size: "World size of device."
-need_profiler: "Whether use profiler. 0 for no, 1 for yes."
-resize_rate: "Resize rate for multi-scale training."
-ann_file: "path to annotation"
-each_multiscale: "Apply multi-scale for each scale"
-labels: "the label of train data"
+rank: "Local rank of distributed"
+group_size: "World size of device"
+need_profiler: "Whether use profiler 0 for no, 1 for yes"
+resize_rate: "Resize rate for multi-scale training"
+
+# Eval Options
+eval_img_dir: "Evaluation images path"
+eval_json_file: "Evaluation annotation file path"
+eval_device: "Device running on evaluation process ('CPU' or 'Ascend')"
+eval_ckpt_file: "model_path, local checkpoint model to load"
+eval_per_batch_size: "Batch size for evaluation"
+eval_batch_limit: "Amount of how many batch will you use for evaluation"
+eval_nms_thresh: "NMS threshold value for evaluation"
+ignore_threshold: "Value of ignore threshold"
+test_ignore_threshold: "Value of test ignore threshold"
 multi_label: "use multi label to nms"
 multi_label_thresh: "multi label thresh"
 
-# Eval options
-eval_data_dir: "Evaluation dataset directory."
-pretrained: "model_path, local pretrained model to load"
-log_path: "checkpoint save location"
-ann_val_file: "path to annotation"
-eval_device: "Device running on evaluation process ('CPU' or 'Ascend')"
-eval_nms_thresh: "NMS threshold value for evaluation."
-eval_batch_limit: "Amount of how many batch will you use for evaluation."
-ignore_threshold: "Value of ignore threshold."
-test_ignore_threshold: "Value of test ignore threshold."
-
-
-# Export options
+# Export Options
 device_id: "Device id for export"
 batch_size: "batch size for export"
-testing_shape: "shape for test"
 ckpt_file: "Checkpoint file path for export"
-file_name: "output file name for export"
-file_format: "file format for export"
-result_files: 'path to 310 infer result floder'
+file_name: "Output file name for export"
+file_format: "File format for export"
+
+# Other Options
+hue: "Hue value of HSV color space (for data agumentation & color distortion)"
+saturation: "saturation value of HSV color space (for data agumentation & color distortion)"
+value: "Value of HSV color space (for data agumentation & color distortion)"
+jitter: "A flicker or fluctuation in display image (for data agumentation & color distortion)"
+num_classes: "Class number"
+max_box: "max value of padding"
+checkpoint_filter_list: "list of checkpoint models"
+anchor_scales: "anchors"
+out_channel: "output shapes"
+input_shape: "input shapes"
+
+# Test Parameters
+test_img_shape: "Image shape for test"
+labels: "The label of train data"
+coco_ids: "İmage ids for COCO dataset"
+
 ```
 
 ## [Training Process](#contents)
@@ -195,7 +236,7 @@ For Ascend device, standalone training can be started like this:
 
 ```shell
 #run training example(1p) by python command
-python train.py \
+python3 train.py \
     --device_target="Ascend" \
     --data_dir=xxx/dataset \
     --yolov5_version='yolov5s' \
@@ -204,7 +245,7 @@ python train.py \
     --T_max=320 \
     --max_epoch=320 \
     --warmup_epochs=4 \
-    --per_batch_size=32 > log.txt 2>&1 &
+    --train_per_batch_size=32 > log.txt 2>&1 &
 ```
 
 The python command above will run in the background, you can view the results through the file `log.txt`.
@@ -229,7 +270,6 @@ After training, you'll get some checkpoint files under the **outputs** folder by
 ```
 
 ### [Distributed Training](#contents)
-
 
 Distributed training example(8p & 2p) by shell script:
 
@@ -273,7 +313,7 @@ You can set a pre-trained model by using `pretrained-checkpoint` flag before the
 
 ```bash
 #run training example(1p) with pretrained model on Ascend by python command
-python train.py \
+python3 train.py \
     --device_target="Ascend" \
     --data_dir=xxx/dataset \
     --is_distributed=0 \
@@ -284,6 +324,7 @@ python train.py \
     --pretrained_checkpoint=/path/of/ckpt/model
 ```
 
+
 ## [Evaluation Process](#contents)
 
 ### [Evaluation](#contents)
@@ -292,10 +333,9 @@ Before running the command below, please check the checkpoint path used for eval
 
 ```bash
 # run evaluation on Ascend by python command
-
-python evaluate.py \
+python3 evaluate.py \
     --config_path [CONFIG_FILE_PATH] \
-    --ckpt_file [CHECKPOINT_PATH] > log_eval.txt 2>&1 &
+    --eval_ckpt_file [CHECKPOINT_PATH] > log_eval.txt 2>&1 &
 ```
 
 ```bash
@@ -321,20 +361,13 @@ Average Recall (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.619
 Average Recall (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.677
 2020-12-21 17:16:40,322:INFO:testing cost time 0.35h
 ```
+
 ### [Visualize Training using MindInsight](#contents)
 
 [MindInsight](https://www.mindspore.cn/mindinsight/docs/en/r1.8/index.html) provides MindSpore with easy-to-use debugging and tuning capabilities. During the training, data such as scalar, tensor, image, computational graph, model hyper parameter and training's execution time can be recorded in the file for viewing and analysis through the visual page of MindInsight.
 
-
 ![MindInsight Architecture](https://raw.githubusercontent.com/mindspore-ai/mindinsight/master/docs/arch.png)
 
-
-
-#### Installation by pip: 
-
-```bash
-pip install mindinsight
-```
 #### Starting Service:
 
 ```bash
@@ -353,7 +386,7 @@ It visualizes the training process, model performance optimization, and accuracy
 ### [Export AIR](#contents)
 
 ```shell
-python export.py --ckpt_file [CKPT_PATH] --file_name [FILE_NAME] --file_format [FILE_FORMAT]
+python3 export.py --ckpt_file [CKPT_PATH] --file_name [FILE_NAME] --file_format [FILE_FORMAT]
 ``` 
 - `file_format` should be in "AIR" or "MINDIR"
 - `export.py` automatically added '_yolov5s' end of the `file_name`
@@ -373,16 +406,47 @@ atc --model=yolov5s.air\
 
 ### [Jupyter Notebook Example Output](#contents)
 
-![Jupyter Output](https://gitee.com/tianyu__zhou/pyacl_samples/raw/a800/acl_yolov5_pt/data/example.png)
+<img src="./ascend310_infer/data/images/predictions.png" alt="prcurve"/>
+
+# [Ascend Performance](#contents)
+## [Training Performance](#contents)
+||8 NPU Ascend 910| 1 NPU Ascend 910|
+|-|-|-|
+|Version|YOLOv5s|YOLOv5s|
+|Resource|Ascend910; CPU 2.10GHz, 80 Cores; Memory, 100G|Ascend910; CPU 2.10GHz, 80 Cores; Memory, 100G|
+|Upload Date|14.11.2022|7.11.2022|
+|Mindspore Version|1.8.0|1.8.0|
+|Dataset| 118287 Images|118287 Images|
+|Training Parameters|epoch=320, lr=0.01, batch_size=32, momentum=0.9, warmup_epoches=4|epoch=320, lr=0.01, batch_size=32, momentum=0.9, warmup_epoches=4|
+|Optimizer|Momentum|Momentum|
+|Loss Function |Sigmoid Cross Entropy with logits, Giou Loss|Sigmoid Cross Entropy with logits, Giou Loss|
+|Outputs |Boxes and Label|Boxes and Label|
+|Speed | 8 NPU about 292.42 FPS|1 NPU about 79.1 FPS|
+|Loss | 86.88|83.297167|
+|Total Time| 1d,11h:38m:26s / 2022-11-11 14:07:23 to 2022-11-13 01:45:49|5d,11h:49m:28s / 2022-11-01 14:00:34 to 2022-11-07 01:50:02|
+|Checkpoint for Fine tuning|57M (.ckpt file)|61M (.ckpt file)|
+|Scripts|https://gitee.com/ktuna/mind-spore-yolov5/blob/master/train.py |https://gitee.com/ktuna/mind-spore-yolov5/blob/master/train.py |
+
+## [Inference Performance](#contents)
+||1 NPU Ascend 910|1 NPU 310 INFERENCE|
+|-|-|-|
+Resource |Ascend910; CPU 2.10GHz, 80 Cores; Memory, 100G | Ascend310; CPU 2.10GHz, 48 Cores; Memory, 64G |
+Upload Date| 14.11.2022 |14.11.2022 |
+Mindspore Version|1.8.0 |1.8.0 |
+Dataset  |4992 Images |4992 Images |
+Batch Size  | 1 |1|
+Outputs  | Box Position, Sorces, and Probability |Box Position, Sorces, and Probability |
+Accuracy | mAP >= 36.7%(shape=640) |mAP >= 36.7%(shape=640)(CPU) / mAP >= 35.3%(shape=640)(Ascend ".om") |
+Total Time | 28m:14s (CPU) / 19m:10s (Ascend) | 37m:34s (CPU) / 10m:26s (Ascend ".om")|
+Model for Inference  | 57M (.ckpt file) | 57M (.ckpt file) / 16M (.om file)|
+
 
 # [Description of Random Situation](#contents)
 
 In dataset.py, we set the seed inside “create_dataset" function. We also use random seed in train.py.
 
-
-
+<br />
 <p align="center">
-  <img src="https://r.huaweistatic.com/s/ascendstatic/lst/header/header-logo.png" width="300" align="center"/>
-  <br />
-  <img src="https://e-file.huawei.com/-/media/hic/products/mindspore/mindspore-logo-v4.png" width="300" align="center" /> 
+  <img src="https://r.huaweistatic.com/s/ascendstatic/lst/header/header-logo.png" width="225" align="center"/>
+  <img src="https://e-file.huawei.com/-/media/hic/products/mindspore/mindspore-logo-v4.png" width="225" align="center" /> 
 </p>

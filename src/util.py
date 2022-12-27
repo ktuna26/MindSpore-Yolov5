@@ -1,4 +1,6 @@
 # Copyright 2021 Huawei Technologies Co., Ltd
+# Created:  2022-11-25 10:12:13
+# MODIFIED: 2022-12-05 12:48:45
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,18 +13,18 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# ============================================================================
-"""Util class or function."""
+# =========================================================================
+"""Util class or function"""
+import os
 import sys
-from collections import defaultdict
 import datetime
 import numpy as np
-from pycocotools.coco import COCO
-from pycocotools.cocoeval import COCOeval
-
 import mindspore as ms
 
 from .yolo import YoloLossBlock
+from pycocotools.coco import COCO
+from collections import defaultdict
+from pycocotools.cocoeval import COCOeval
 
 
 class AverageMeter:
@@ -168,21 +170,19 @@ def cpu_affinity(rank_id, device_num):
 class DetectionEngine:
     """Detection engine."""
 
-    def __init__(self, args_detection, threshold):
+    def __init__(self, args_detection, threshold, only_eval = False):
         self.ignore_threshold = threshold
         self.labels = args_detection.labels
         self.num_classes = len(self.labels)
         self.results = {}
         self.file_path = ''
         self.save_prefix = args_detection.output_dir
-        self.ann_file = args_detection.ann_file
-        self._coco = COCO(self.ann_file)
-        self._img_ids = list(sorted(self._coco.imgs.keys()))
+        self.ann_file = os.path.join(args_detection.data_dir, \
+                                    args_detection.eval_json_file)
         self.det_boxes = []
         self.nms_thresh = args_detection.eval_nms_thresh
         self.multi_label = args_detection.multi_label
         self.multi_label_thresh = args_detection.multi_label_thresh
-        self.coco_catids = self._coco.getCatIds()
         self.coco_catIds = args_detection.coco_ids
 
     def do_nms_for_results(self):
