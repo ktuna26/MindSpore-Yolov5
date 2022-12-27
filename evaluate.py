@@ -69,7 +69,8 @@ def run_eval(epoches = 1, network_params=None):
         ms.set_context(mode = ms.GRAPH_MODE, device_target = config.eval_device)
 
         start_time = time.time()
-
+        
+        batch = config.train_per_batch_size
         if network_params==None:
             config.logger.info(f'================= CONFIG MODE ON =================') # Path to files from config file
             # image folder path from config file
@@ -85,9 +86,10 @@ def run_eval(epoches = 1, network_params=None):
             # Calling YOLOv5 Model to update weights with selected ckpt file
             network = YOLOV5(is_training = False, version = dict_version[config.yolov5_version])
 
+            batch = config.eval_per_batch_size
             config.logger.info('Dataset Creating')
             ds = create_yolo_dataset(config.eval_img_dir, config.eval_json_file, is_training=False, 
-                                batch_size=config.eval_per_batch_size, device_num=1, rank=0, shuffle=False, config=config) 
+                                batch_size=batch, device_num=1, rank=0, shuffle=False, config=config) 
 
             # Changing Model Mode Train to False for Inference
             network.set_train(False) 
@@ -111,14 +113,14 @@ def run_eval(epoches = 1, network_params=None):
             raise FileNotFoundError(f"{config.eval_ckpt_file} is not a filename.")
 
         config.logger.info(f'Shape of Test File is: {config.eval_img_shape}')
-        config.logger.info('Total %d Images to Eval'% (ds.get_dataset_size() * config.eval_per_batch_size))
+        config.logger.info('Total %d Images to Eval'% (ds.get_dataset_size() * batch))
         
         # INFERENCE EXECUTION PART
         config.logger.info(f'Inference Begins...')
         
         batches_track = 0
         if config.eval_batch_limit == 0:
-            config.eval_batch_limit = int(config.dataset_size / config.eval_per_batch_size)
+            config.eval_batch_limit = int(config.dataset_size / batch)
             print(f'Evaluation batch limit set: {config.eval_batch_limit}')
             
         for index, data in enumerate(ds.create_dict_iterator(output_numpy=True, num_epochs=1)):
@@ -138,7 +140,7 @@ def run_eval(epoches = 1, network_params=None):
             output_small = output_small.asnumpy()
 
             # Detection part
-            detection.detect([output_small, output_me, output_big], config.eval_per_batch_size, image_shape_, image_id_)
+            detection.detect([output_small, output_me, output_big], batch, image_shape_, image_id_)
             batches_track += 1
 
             # Limiting batches to create test result with limited image to process faster

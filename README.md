@@ -406,8 +406,7 @@ atc --model=yolov5s.air\
 
 ### [Jupyter Notebook Example Output](#contents)
 
-![Jupyter Output](https://gitee.com/tianyu__zhou/pyacl_samples/raw/a800/acl_yolov5_pt/data/example.png)
-
+<img src="./ascend310_infer/data/images/predictions.png" alt="prcurve"/>
 
 # [Ascend Performance](#contents)
 ## [Training Performance](#contents)
@@ -446,9 +445,8 @@ Model for Inference  | 57M (.ckpt file) | 57M (.ckpt file) / 16M (.om file)|
 
 In dataset.py, we set the seed inside “create_dataset" function. We also use random seed in train.py.
 
-
+<br />
 <p align="center">
-  <img src="https://r.huaweistatic.com/s/ascendstatic/lst/header/header-logo.png" width="300" align="center"/>
-  <br />
-  <img src="https://e-file.huawei.com/-/media/hic/products/mindspore/mindspore-logo-v4.png" width="300" align="center" /> 
+  <img src="https://r.huaweistatic.com/s/ascendstatic/lst/header/header-logo.png" width="225" align="center"/>
+  <img src="https://e-file.huawei.com/-/media/hic/products/mindspore/mindspore-logo-v4.png" width="225" align="center" /> 
 </p>

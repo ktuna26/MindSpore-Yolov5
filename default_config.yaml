@@ -81,7 +81,7 @@ eval_device: "CPU" # Device to run evaluations
 eval_ckpt_file: "./output/" # Path to pretrained .ckpt file or folder(It gets last file from folder by date) Ex: ./output/
 eval_img_shape : [640, 640] # Evaluation image input
 #
-eval_per_batch_size : 32 # Per image amount for per evaluation step
+eval_per_batch_size : 32 # Per image amount for per evaluation step !! Note !! if the eval operation will be performed during the training, train_batch is taken into account.
 eval_batch_limit: 0 # Amount of how many batch will you use for evaluations. 0 for no limit
 eval_nms_thresh: 0.45 # nms parameter for bboxes
 ignore_threshold: 0.6 # Threshold for confidence of detections
